@@ -39,9 +39,24 @@ Actual corrected run proves **all 13 target crop growth values are loaded at the
 
 The remaining MO error events are `Cannot create FMOD::Sound instance for clip "" (FMOD error: Unsupported file or audio format.)` (two each). Separately reproduced MO-provider FMOD failures without this crop Mod have been documented by the Project native host owner. **Do not suppress, downgrade or attribute this failure to the crop patch without evidence.** No new native MO ERROR0 claim.
 
+## Native real-pawn field run — controlled crop sampling, not whole-season farming
+
+[Project Linux 1.6 Actions #38552728714](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38552728714), artifact **11887632208** (game/launcher logs, build logs, individual JSON summaries), owner source **`c63ceb21a7e6673e2e04284509704acd8f308de9`**. Actual RimWorld **1.6.4871 rev600**, isolated source-owned `CropGrowthFieldQuickstart`, `CropGrowthFieldSteps` and one `crop-growth-field-16.feature` scenario per profile. All four scenarios **1/1 PASS**, all four process exits 0, no timeouts. Vanilla and Vanilla+CCTO additionally satisfy Unity ERROR0; MO and MO+CCTO have the same **2 previously independently reproduced FMOD ERRORs each**, so the four-profile strict result is **FAIL**, 2/4 full profiles passing.
+
+The disposable map uses original native crop Defs (no fake growing/yield defs), a generated pawn with growing skill 20, real `JobDefOf.Sow` and `HarvestDesignated` Jobs, Soil fertility 100%, 25 °C and synthetic outdoor daylight. Every 2,000 controlled calendar ticks, `Plant.TickLong` was called; 300 and 600 calls represent 10 and 20 in-game calendar days, **without advancing other map/world/pawn systems for those days**.
+
+| Profile | Original crop | Growth at day 10 | Day 20 | Real pawn harvest (items) | Base harvestYield | Native fertility growth factor 50 / 100 / 140% | Pickle | ERROR | Full gate |
+|---|---|---:|---:|---:|---:|---|---|---:|---|
+| Vanilla | `Plant_Potato` | 0.6768 | 1.0000 | 15 `RawPotatoes` | 11 | 0.80 / 1.00 / 1.16 | 1/1 PASS | 0 | PASS |
+| Vanilla+CCTO | `Plant_Potato` | 0.6768 | 1.0000 | 14 `RawPotatoes` | 11 | 0.80 / 1.00 / 1.16 | 1/1 PASS | 0 | PASS |
+| MO | `DankPyon_Plant_Lentils` | 0.5076 | 1.0000 | 14 `DankPyon_RawLentils` | 10 | 0.65 / 1.00 / 1.28 | 1/1 PASS | 2 | FAIL (FMOD) |
+| MO+CCTO | `DankPyon_Plant_Lentils` | 0.5077 | 1.0000 | 14 `DankPyon_RawLentils` | 10 | 0.65 / 1.00 / 1.28 | 1/1 PASS | 2 | FAIL (FMOD) |
+
+The 50% and 140% figures are **native fertility growth-factor calculations**, not actual harvests on those terrains. One harvest per profile is not a statistically stable yield or annual calorie comparison; pawn harvest yield bonuses and random rounding mean the 14/15 potato difference is not a CCTO effect. This test **does not establish** full real calendar seasonal transitions, repeated harvests, sow/harvest/processing throughput, cooking nutrition, or normal-play annual yields. No additional crop yield/growth numbers are authorized by these observations.
+
 ## Remaining tasks
 
-- Actual pawn sowing, growth to harvest, repeated crops, cut/harvest jobs, soil 50/100/140%, season length 10/20 calendar days, consumption/processing and harvest nutrition/labor; static ratio audit lives at [PreliminaryHarvestProductivity-20261014.md](../Balance/PreliminaryHarvestProductivity-20261014.md). No new yield number is approved yet.
+- Full-season/repeated-crop whole-game map simulation with actual 50/100/140% terrain harvests, 10/20-calendar-day outdoor growing seasons, consumption/processing, calorie/area and work-time accounting; first controlled real pawn sow/harvest and TickLong growth sampling is already evidenced above. Static source ratio audit lives at [PreliminaryHarvestProductivity-20261014.md](../Balance/PreliminaryHarvestProductivity-20261014.md). No new yield number is approved yet.
 - Native Grains-alone vs Crop Growth Balance-alone vs optional combined profiles; verify Grains seven crops, `Plant_Rice=5`, MO wheat 12 and no duplicate global patches.
 - MO strict ERROR0 remains open on the native Linux host pending independently resolved existing FMOD source issue. Do not weaken overall acceptance thresholds.
 - RimWorld **1.7** official source/actual game/Vanilla and MO loaded profile verification; not supported or tested by these 1.6 runs.
