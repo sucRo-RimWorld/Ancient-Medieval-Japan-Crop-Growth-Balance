@@ -13,3 +13,5 @@ jobs:
           python-version: '3.12'
       - name: Validate XML ownership, conditional MO, and numeric values
         run: python -m unittest discover -s Tests -p 'test_*.py' -v
+      - name: Construct explicit allowlist GitHub Actions subscriber candidate (no Steam upload)
+        run: python Tools/build_workshop_candidate.py --output TestResults/WorkshopCandidate

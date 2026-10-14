@@ -52,3 +52,10 @@
 原本MO・CCTOを用いた隔離Linux 1.6において、[生育日数の読み込み・実Pawn播種／収穫／生長](Testing/Native16-CropGrowth-20261014.md) と [Grains同時ロード](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38577898742) の個別Pickle検証は全4構成で成功。Grains同時ロードによる値の衝突も検出されていない。
 
 **注意:** MO・MO+CCTOの原本プロバイダーに既知のFMOD音声エラーが各2件あり、既存の厳格Unity ERROR0ワークフロー判定は**2/4、全体FAILのまま**。これはCrop Growth BalanceのXML機能テスト成功と区別し、4/4 ERROR0や包括的ゲーム環境PASSと主張しない。音声不具合は別系統で管理する。1.7対応、セーブ継続性、最終配布ペイロード、公開実行は未確認。詳細な15作物の収量・栄養・Pawn作業・1日tick検証は [既存の参考監査](Balance/PreliminaryHarvestProductivity-20261014.md) に保存し、**完成条件として使用しない**。
+
+## Workshop配布経路（2026-10-15 作者確定）
+
+**今後はGitHub Actionsだけで配布物を構築・検証・Steamへアップロードする。YADAは使用しない。** 2026-10-14以前の `.rimignore` は旧アップロード方式の名残であり、Actionsの配布対象を決定しない。Actionsは必要な実行用・ライセンスファイルを明示的な許可リストから一時ステージへコピーする。テスト専用C#、Docs、Tools、Tests、README、Git管理情報は配布しない。新しいバージョンメタデータ／プレビュー等が加わる場合は許可リストと検証を同時更新する。
+
+**現状:** このリポジトリにはActionsのXML検証があるが、手動承認付きSteamアップロード経路・専用publisherの実装は未完了。GitHub Actionsでの候補ステージ構築はSteam送信ではない。公開時はGrainsと同時、最初のWorkshopアイテム作成にはID・所有アカウント・非公開状態の明示的な検証が必要。SteamCMDアップロード後もタグのSteamworks同期、実配布内容、公開状態を確認する。公開やアップロードをpush/PRトリガーから実行しない。
+
