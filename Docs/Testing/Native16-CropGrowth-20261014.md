@@ -1,3 +1,20 @@
+# Converted-audio Linux 1.6 Crop field regression — 4/4 functional PASS (2026-10-14)
+
+**Actual execution:** [Project Actions #38573922208](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38573922208), native log artifact **11898622328**, actual RimWorld **1.6.4871 rev600**, owner source **`7a3c7a745deecd0ba0e58d0a207b9f10e2bf1ca6`**, Project host **`f07c645480779853289d82d232eb49f0bbe95cec`**. GitHub workflow and native `mo-wav-owner-native` job completed **success** (not merely decoder download or a skipped native job).
+
+| Native profile | Source-owned original field Pickle | Unity ERROR | Natural game exit | Converted-audio functional result |
+|---|---|---:|---:|---|
+| Vanilla | 1/1 | 0 | 0 | PASS |
+| Vanilla+CCTO | 1/1 | 0 | 0 | PASS |
+| MO | 1/1 | 0 | 0 | PASS |
+| MO+CCTO | 1/1 | 0 | 0 | PASS |
+
+The original matched-calendar real Pawn sow/harvest and 70/100/140% terrain tests, original Potato/MO Lentils, 10/20/30-day plant-only growth and same-tomato assertions were run by the **unchanged original owner test code**, using the source-pinned four-profile suite on an isolated licensed Linux game copy. The Project host first verified the original SYR `Sounds/UI/DebugGoose/Honk.mp3` SHA-256 `26dfcb1140ebd2e90af39ef36a29319188d59d7a25605c69fd54c4959f62f639` and MO `Sounds/DankPyon_FlaskBreak.mp3` SHA-256 `a7d5b05bc6c40bbb90182065821b87b31929c9d597b1fee3fe9392c0f5989ad2`, then converted **only their disposable copies** to 44.1 kHz stereo 16-bit PCM WAV. Verified generated WAV digests `ed424458599dd60088e264f01ca51de53f21c155aacb424058a27e6a95f0b591` and `6f9136407694bcbbb9b4036692cc4e02f65a7fb66bea3f138df16c1f6d2e6d43`. Original source provider packages, SoundDefs, source MP3s and user/Steam installations were unchanged. No Unity errors were ignored, filtered or waived.
+
+**Acceptance boundary:** This is **4/4 real-game Pickle + ERROR0 with corrected private audio**, not a claim of **4/4 strict original-provider MP3 acceptance** or audible sound playback. The immediately preceding [unmodified-audio original-provider run #38570534129](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38570534129), artifact 11898411270, had the same four source-owned Pickle scenarios 1/1 each, but MO/MO+CCTO Unity FMOD2 each and failed strict ERROR0. Full-season/economics, 50% native sow, Grains coexistence, 1.7 and public release remain independently OPEN. The controlled terrain/yield numbers and single-plant interpretation are in the subsequent matched-calendar section; WAV conversion **does not change** their values or authorize rebalancing.
+
+---
+
 ## Matched-calendar real fertility harvest #38570534129 — four native Pickle PASS (2026-10-14)
 
 **Provenance:** [Project 1.6 Linux run #38570534129](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38570534129), artifact **11898411270**; owner source `7a3c7a745deecd0ba0e58d0a207b9f10e2bf1ca6`, Project host `236002bcf7ba4be28d1b4d3ad5e6573202d73cc3`, native RimWorld `1.6.4871 rev600`. Original Gravel=70%, Soil=100%, SoilRich=140%, native Pawn Sow/Harvest jobs and original Potato or MO Lentils, 25°C and original plant growth `Plant.TickLong` with 2,000-tick steps. Within each profile, baseline 100% Soil, later 70% Gravel and 140% SoilRich growth samples started at **exactly the same `matchedGrowthCalendar`** (reported per profile as 15342/15414/15342/15318 game ticks). These are controlled *plant-only* 10/20/30-day growth measurements, NOT full world/map/colony seasons.
