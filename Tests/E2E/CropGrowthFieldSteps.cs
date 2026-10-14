@@ -306,7 +306,70 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         " growthAfter=" + testPlant.Growth.ToString("F4") +
                         " sourceHarvestAfterGrowth=0.30" +
                         " realHarvestJob=true realSowJob=false realTrellis=false" +
-                        " repeatedHarvest=NOT_RUN");
+                        " repeatedHarvest=CONTROLLED_TEST_NEXT");
+                });
+                // Probe the same original mature tomato's second cycle.
+                // Only Plant.TickLong is calendar-advanced; no natural season,
+                // trellis sowing, hauling, meals or colony ticks are simulated.
+                int reGrowthStart = 0;
+                await RuntimeThread.Run(() =>
+                {
+                    ctx.Require(testPlant.Spawned && !testPlant.Destroyed &&
+                        Math.Abs(testPlant.Growth - .3f) < .001f,
+                        "First native tomato harvest did not retain original plant at 30%");
+                    reGrowthStart = Find.TickManager.TicksGame;
+                });
+                float secondAt10 = 0f, secondAt20 = 0f;
+                for (int k = 1; k <= 600; k += 30)
+                {
+                    int start = k;
+                    await RuntimeThread.Run(() =>
+                    {
+                        ctx.Require(deadline.Elapsed.TotalSeconds < 230,
+                            "Repeated native tomato TickLong sample timed out");
+                        for (int j = start; j < Math.Min(start + 30, 601); j++)
+                        {
+                            Find.TickManager.DebugSetTicksGame(reGrowthStart + j * 2000);
+                            map.skyManager.ForceSetCurSkyGlow(GenCelestial.CurCelestialSunGlow(map));
+                            ctx.Require(testPlant.Spawned && !testPlant.Destroyed,
+                                "Original tomato unexpectedly vanished before second maturity");
+                            testPlant.TickLong();
+                            if (j == 300) secondAt10 = testPlant.Growth;
+                            if (j == 600) secondAt20 = testPlant.Growth;
+                        }
+                    });
+                    await Task.Delay(1);
+                }
+                int beforeSecond = 0;
+                Job secondJob = null;
+                await RuntimeThread.Run(() =>
+                {
+                    ctx.Require(secondAt10 > .3f && secondAt10 <= secondAt20 &&
+                        secondAt20 >= .999f,
+                        "Retained tomato failed to regrow: growth10=" + secondAt10 +
+                        " growth20=" + secondAt20);
+                    beforeSecond = CountItem(harvestedDef);
+                    map.designationManager.AddDesignation(
+                        new Designation(testPlant, DesignationDefOf.HarvestPlant));
+                    secondJob = new WorkGiver_PlantsCut().JobOnThing(worker, testPlant, true);
+                    ctx.Require(secondJob != null && secondJob.def == JobDefOf.HarvestDesignated,
+                        "Native WorkGiver did not offer same-plant second tomato harvest");
+                    OfferAndStart(secondJob, "tomato-second-harvest");
+                });
+                await TickJob(secondJob, () => CountItem(harvestedDef) > beforeSecond,
+                    "tomato-second-harvest");
+                await RuntimeThread.Run(() =>
+                {
+                    int secondCount = CountItem(harvestedDef) - beforeSecond;
+                    ctx.Require(secondCount > 0, "Same native tomato yielded no second crop");
+                    Log.Message("AMJ_CROP_TOMATO_SECOND_HARVEST profile=" + profile +
+                        " item=" + harvestedDef + " count=" + secondCount +
+                        " growth10=" + secondAt10.ToString("F4") +
+                        " growth20=" + secondAt20.ToString("F4") +
+                        " postSecondGrowth=" + testPlant.Growth.ToString("F4") +
+                        " originalPlantSurvived=" + (testPlant.Spawned && !testPlant.Destroyed) +
+                        " realHarvestJob=true repeatedSamePlant=true" +
+                        " sowOnNativeTrellis=NOT_RUN fullWorldSeason=NOT_RUN");
                 });
             }
 

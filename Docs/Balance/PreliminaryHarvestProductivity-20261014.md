@@ -44,7 +44,7 @@
 - MO亜麻は繊維系、サトウキビは加工・製糖原料、Vanilla綿花・ホップ・スモークリーフも非食料作物。**栄養量0として食料競争で敗者扱いするのは誤り**。加工Work、製品市場価値・保存性・用途を別の指標で見る。
 
 
-**2026-10-14追加観測：** [Project #38561878157](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38561878157)（owner `1ee767c48e4072b8b5ce0592b4ab032da62943c5`）で、MO+CCTOの成熟トマトをテスト区画に直接生成し、Pawnが実際に収穫したところ、**10個・株は残存・成長率0.3000**を記録した。**最初の収穫直後に30%が残ることはこの条件で確認**した。ただし専用支柱での播種・次回の成長・2回目収穫は未実施のため、長期収量モデルで再成長率1.633を確定採用しない。MO単独は生成Pawnの収穫倍率不足により試験前にFAIL、修正再実行待ち。Vanilla/CCTOジャガイモは0.7/1.0/1.4の土で播種Job提示を確認（収穫したのは1.0のみ）。詳細は [Native16-CropGrowth](../Testing/Native16-CropGrowth-20261014.md)。
+**2026-10-14追加観測・続報：** [Project #38561878157](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38561878157)（owner `1ee767c48e4072b8b5ce0592b4ab032da62943c5`）で、MO+CCTOの成熟トマトをテスト区画に直接生成し、Pawnが実際に収穫したところ、**10個・株は残存・成長率0.3000**を記録した。**最初の収穫直後に30%が残ることはこの条件で確認**した。ただし専用支柱での播種・次回の成長・2回目収穫は未実施のため、長期収量モデルで再成長率1.633を確定採用しない。初回はMO単独で生成Pawnの収穫倍率不足により試験前にFAILしたが、作業者選別を修正した再試験 [#38563498513](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38563498513) では**4構成ともPickle 1/1 PASS**（MO両構成のUnity FMOD2は残存）。MO単独・MO+CCTOとも、成熟トマトを実Pawnが収穫後、**各11個生成・同じ株が残り成長率0.3000**を確認した。2回目の収穫はまだ未測定。Vanilla/CCTOジャガイモは0.7/1.0/1.4の土で播種Job提示を確認（収穫したのは1.0のみ）。詳細は [Native16-CropGrowth](../Testing/Native16-CropGrowth-20261014.md)。
 
 ### 次の数値判断ゲート（未採用の感度分析）
 

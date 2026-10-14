@@ -39,6 +39,20 @@ Actual corrected run proves **all 13 target crop growth values are loaded at the
 
 The remaining MO error events are `Cannot create FMOD::Sound instance for clip "" (FMOD error: Unsupported file or audio format.)` (two each). Separately reproduced MO-provider FMOD failures without this crop Mod have been documented by the Project native host owner. **Do not suppress, downgrade or attribute this failure to the crop patch without evidence.** No new native MO ERROR0 claim.
 
+## Focused four-profile rerun — all source-owned Pickle scenarios PASS (2026-10-14)
+
+- [Project Actions #38563498513](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38563498513), artifact **11893059095**; exact owner source `63d85aa1a943ff79f9a7af8816f95e4700da8d81`, Project source `49082be015b87f19bbfc18d3162aff4585976ffa`, actual game 1.6.4871 rev600.
+- **Pickle:** Vanilla 1/1, Vanilla+CCTO 1/1, MO 1/1, MO+CCTO 1/1 all PASS with process exit0. **Unity ERROR:** 0/0/2/2. Thus **strict workflow FAIL**, only Vanilla and Vanilla+CCTO meet complete profile gate; independent MO FMOD2 persists with no masking. Random worker eligibility pre-filter successfully let MO-only reach its native jobs.
+- **Native original terrain WorkGiver sow offer** (not real sow/harvest on each soil): original `Gravel` 0.70, `Soil` 1.00, `SoilRich` 1.40 each offered `JobDefOf.Sow` for potato in both Vanilla profiles and lentils in both MO profiles; loaded `fertilityMin=0.70` for these crops. Native 50% sow job **NOT RUN**.
+- On real `Soil` 1.00, first real pawn sow and harvest with controlled `Plant.TickLong` 10/20-day samples: potato day10 0.6768/day20 1.0000, harvested **16** (Vanilla, worker yieldStat 1.1300), **15** (CCTO, yieldStat 1.1300), base 11. Lentils day10 0.5076/0.5077, day20 1.0000, harvested **14** (MO, yieldStat 1.1232), **13** (MO+CCTO, yieldStat 1.1063), base 10. One harvest per crop/profile does not identify expected mean, annual food/nutrition or CCTO effects.
+- **MO tomato — first native same-plant behavior validated twice:** each MO and MO+CCTO test placed the genuine, pre-matured original MO tomato on Soil and used an actual Pawn `HarvestDesignated` Job. Both harvested **11** tomatoes and left the **same living, spawned plant with Growth=0.3000**. This confirms first-harvest 30% retention in both profiles. **Not tested:** sow on real `DankPyon_Post`, real second ripening interval/second harvest, colony season, field labor. Preserving 30% alone does **not** justify adopting the modeled rate 8/4.9 as a long-term harvest economy fact.
+
+## Next native two-harvest scope (new source, NOT RUN as of this report)
+
+- Source-owned existing `CropGrowthFieldSteps.cs` will take the **same** real native original tomato after its first real pawn harvest, require it remains spawned at 30%, call normal `Plant.TickLong` over a *controlled* 10/20 calendar-day growth sample at 25°C / outdoor simulated sky and 100% Soil, then require a real second Pawn `HarvestDesignated` Job for that plant and nonzero second item yield.
+- It does **not** install a normal MO trellis/research setup, advance map/world systems over all 20 days, execute 50/70/140% *harvest* Jobs, or infer annual calories/labor/season outcomes. The old FMOD strict ERROR0 gate remains mandatory.
+- This is a **planned scenario scope**, not a second-harvest PASS; update the table only after actual source-pinned host execution.
+
 ## Focused native soil/tomato field run #38561878157 — first execution, strict FAIL (2026-10-14)
 
 - **Source / host:** owner `1ee767c48e4072b8b5ce0592b4ab032da62943c5`, Project `e24c2bbf121b3c606141d28926d6fe6dbc2d743a`, actual 1.6.4871 rev600. [Actions #38561878157](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38561878157), archived source-owned log artifact **11892407640**.
