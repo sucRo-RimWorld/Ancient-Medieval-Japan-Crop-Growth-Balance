@@ -1,0 +1,15 @@
+name: Crop growth XML/static validation
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  xml-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate XML ownership, conditional MO, and numeric values
+        run: python -m unittest discover -s Tests -p 'test_*.py' -v
