@@ -70,6 +70,12 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertIn("ProbeControlledTomatoHarvest", step)
         self.assertIn("AMJ_CROP_TOMATO_HARVEST", step)
         self.assertIn("AMJ_CROP_TOMATO_SECOND_HARVEST", step)
+        self.assertIn('ProbeRealTerrainHarvest("Gravel", .7f)', step)
+        self.assertIn('ProbeRealTerrainHarvest("SoilRich", 1.4f)', step)
+        self.assertIn("AMJ_CROP_SOIL_REAL_HARVEST", step)
+        self.assertIn("realPawnSow=true realPawnHarvest=true", step)
+        self.assertIn("worldSeasonTicked=false", step)
+
         self.assertIn("repeatedSamePlant=true", step)
         self.assertIn("postSecondGrowth=", step)
         self.assertIn("candidate.GetStatValue(StatDefOf.PlantHarvestYield) >= 1f", step)
