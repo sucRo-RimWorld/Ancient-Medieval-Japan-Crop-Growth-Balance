@@ -135,7 +135,7 @@ The 50% and 140% figures are **native fertility growth-factor calculations**, no
 ## Remaining tasks
 
 - Full-season/repeated-crop whole-game map simulation with actual 50/100/140% terrain harvests, 10/20-calendar-day outdoor growing seasons, consumption/processing, calorie/area and work-time accounting; first controlled real pawn sow/harvest and TickLong growth sampling is already evidenced above. Static source ratio audit lives at [PreliminaryHarvestProductivity-20261014.md](../Balance/PreliminaryHarvestProductivity-20261014.md). No new yield number is approved yet.
-- Native Grains-alone vs Crop Growth Balance-alone vs optional combined profiles; verify Grains seven crops, `Plant_Rice=5`, MO wheat 12 and no duplicate global patches.
+- Grains+CGB original loaded-Def coexistence checked 4/4 Pickle below (strict ERROR-zero only 2/4 owing to MO FMOD); combined native field crops, processing/meal work and seasonal economy remain OPEN.
 - MO strict ERROR0 remains open on the native Linux host pending independently resolved existing FMOD source issue. Do not weaken overall acceptance thresholds.
 - RimWorld **1.7** official source/actual game/Vanilla and MO loaded profile verification; not supported or tested by these 1.6 runs.
 - Steam/2game and user's normal Mods folder **not updated or published** by these GitHub test runs.
@@ -164,3 +164,19 @@ Actual source-pinned [Project Linux run #38574555592](https://github.com/sucRo-R
 
 All loaded `fertilityMin` were **0.70**, with the same applicable loaded values in both CCTO states. Loaded cotton harvest item is `Cloth` in Vanilla profiles and `DankPyon_RawCotton` with MO; the other original MO items remain their original named source Defs. Original `DankPyon_RawTomatoes` does **not** explicitly define `Nutrition` in the 1.6 MO source XML, but its inherited actual loaded ThingDef stat is **0.05**. Flax/sugarcane/hops/smokeleaf likewise having a nonzero item `Nutrition` stat is **not proof of direct edibility**. `base harvestYield` is not a Pawn's actual collected output and `0.70 fertilityMin` is not a performed Pawn sow job at 50% ground. No Grains coexistence, production change, yearly season, labor, trellis sow or processed food yield was established by this run. The separate converted-audio 4/4 ERROR0 field trial uses **disposable PCM WAV copies**; this run retains **unmodified provider MP3** and therefore its original FMOD errors. Never combine their acceptance scopes.
 
+## Native Grains+CGB original loaded-Def coexistence #38577898742 (2026-10-14)
+
+**Evidence:** [Project Linux run #38577898742](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38577898742), artifact **11900508581** containing all four Unity and launcher logs, Pickle summaries and structured results. Exact CGB source `f4f5d1a61162b199ecea087fe8f5dc765b386511`, original Grains `6cfd4417020caf55facb86233ae8ea02a00560a3`, Project runner `215a4f457874475fd23cd4b981c13245b5c7fc0b`; game **RimWorldLinux 1.6.4871 rev600** on isolated Xvfb. Production Defs from the independently cloned real Mod source; temporary test Mod, no live user saves, normal Mods installation or Steam upload.
+
+**Exact test assumptions:** Grains is enabled for every row. Assert loaded CGB Vanilla `Plant_Potato=6`, `Plant_Corn=13`, `Plant_Strawberry=6`, `Plant_Cotton=10`, `Plant_Hops=7`, `Plant_Smokeleaf=9`; only with MO, `DankPyon_Plant_Onions=8`, `DankPyon_Plant_Lentils=8`, `DankPyon_Plant_Garlic=10`, `DankPyon_Plant_Flax=9`, `DankPyon_Plant_Sugarcane=12`, `DankPyon_Plant_Carrots=6`, `DankPyon_Plant_Tomatoes=7`. Independently check Grains `AMJC_Plant_FoxtailMillet_Awa=6`, `AMJC_Plant_BarnyardMillet_Hie=6`, `AMJC_Plant_ProsoMillet_Kibi=5`, `AMJC_Plant_Buckwheat_Soba=4`, `AMJC_Plant_Barley=10`, shared `Plant_Rice=5`, and `AMJC_Plant_Wheat=12` when MO absent versus `DankPyon_Plant_Wheat=12` when present. Assert actual original-provider package identities and exact one source-owned Pickle scenario per profile.
+
+| Original provider profile (both Grains and CGB enabled) | Pickle | Game exit | Unity ERROR | Strict outcome |
+|---|---:|---:|---:|---|
+| Vanilla | **1/1 PASS** | 0 | **0** | **PASS** |
+| Vanilla+CCTO | **1/1 PASS** | 0 | **0** | **PASS** |
+| MO | **1/1 PASS** | 0 | **2** | **FAIL** |
+| MO+CCTO | **1/1 PASS** | 0 | **2** | **FAIL** |
+
+All four source-owned scenarios passed with no failed/skipped/flaky tests or timeout, but **overall workflow FAIL** because the unmodified MO profiles log two original `Cannot create FMOD::Sound instance for clip "" (FMOD error: Unsupported file or audio format.)` Unity ERRORs each. Inspected the actual archived Unity logs. The two non-MO profiles are the only strict ERROR0 successes. No errors were waived or downgraded.
+
+**Boundary:** Simultaneous original 1.6 loaded Def values establish no detected ownership collision across the named 13+7 crops. They do not establish combined real Pawn sow/harvest, growing seasons, cooking/processing recipes, actual nutritional throughput or labor, save/restore, 1.7 compatibility, or compatibility with every third-party crop patch. No new crop `growDays`, `harvestYield`, nutrition or dependency value is authorized by this test.
