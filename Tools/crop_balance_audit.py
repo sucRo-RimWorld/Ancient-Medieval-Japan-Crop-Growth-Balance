@@ -37,6 +37,20 @@ GRAINS = {"Awa": (6, 13, .5), "Hie": (6, 12, .5),
           "Kibi": (5, 11, .5), "Soba": (4, 8, .4),
           "Barley": (10, 22, .5), "Wheat": (12, 28, .7),
           "Rice": (5, 11, .7)}
+# This describes only an explicit 1.6 XML value. It is NEVER an
+# inherited/loaded ThingDef value or a value after other patches.
+MO_EXPLICIT_RAW_NUTRITION = {
+    "DankPyon_Plant_Onions": ("DankPyon_RawOnions", .05),
+    "DankPyon_Plant_Lentils": ("DankPyon_RawLentils", .05),
+    "DankPyon_Plant_Garlic": ("DankPyon_RawGarlic", .05),
+    "DankPyon_Plant_Flax": ("DankPyon_RawFlax", None),
+    "DankPyon_Plant_Sugarcane": ("DankPyon_Sugarcane", None),
+    "DankPyon_Plant_Carrots": ("DankPyon_RawCarrots", .05),
+    "DankPyon_Plant_Tomatoes": ("DankPyon_RawTomatoes", None),
+    "DankPyon_Plant_Cabbages": ("DankPyon_RawCabbages", .05),
+    "DankPyon_Plant_Pumpkins": ("DankPyon_RawPumpkins", .05),
+}
+MO_RAW_XML = "3219596926/1.6/Defs/ThingDefs_Items/Items_Resource_RawPlant.xml"
 MO_XML = "3219596926/1.6/Defs/ThingDefs_Plants/Plants_Cultivated_Farm.xml"
 PATH_PATTERN = re.compile(r'^/Defs/ThingDef\[defName="([^"]+)"\]/plant/growDays$')
 
@@ -60,7 +74,18 @@ def growth_patches(path: Path) -> dict[str, float]:
 def verify_mo_source(archive: Path) -> None:
     with ZipFile(archive) as z:
         root = ET.fromstring(z.read(MO_XML))
+        raw = ET.fromstring(z.read(MO_RAW_XML))
     nodes = {node.findtext("defName"): node for node in root.findall("ThingDef")}
+    items = {node.findtext("defName"): node for node in raw.findall("ThingDef")}
+    for crop, (item_name, declared) in MO_EXPLICIT_RAW_NUTRITION.items():
+        item = items.get(item_name)
+        if item is None:
+            raise ValueError("MO 1.6 raw harvested ThingDef missing: " + item_name)
+        xml_nutrition = item.findtext("statBases/Nutrition")
+        direct = float(xml_nutrition) if xml_nutrition is not None else None
+        if direct != declared:
+            raise ValueError("MO 1.6 explicit raw Nutrition drift: " + crop +
+                             " " + repr(direct))
     for name, (days, yield_count, sensitivity, remaining) in MO.items():
         node = nodes.get(name)
         if node is None:
@@ -103,6 +128,8 @@ def audit(hours: float = 13., mo_zip: Path | None = None) -> dict:
             original, yield_count, sensitivity = entry[:3]
             after = entry[3] if len(entry) == 4 else 0
             effective = (v if provider == "Vanilla" else m).get(name, original)
+            declared_nutrition = (MO_EXPLICIT_RAW_NUTRITION[name][1]
+                                  if provider == "MO" else None)
             first_days = effective * 24 / hours
             rows.append({"provider": provider, "defName": name,
                          "originalGrowDays": original, "effectiveGrowDays": effective,
@@ -116,6 +143,10 @@ def audit(hours: float = 13., mo_zip: Path | None = None) -> dict:
                          "idealFullHarvestsIn20Days": harvest_events(effective, hours, 20),
                          "fertilityFactors": {str(f): round(1 + sensitivity * (f - 1), 4)
                                              for f in (.5, .7, 1., 1.4)},
+                         "rawNutritionExplicitInMO16": declared_nutrition,
+                         "grossRawNutritionPerGrowthDayIfExplicit": (
+                             round(yield_count * declared_nutrition / effective, 4)
+                             if declared_nutrition is not None else None),
                          "loadedNutritionVerified": False})
     return {"scope": "1.6 XML + offline idealized growth model, not native runtime or edible yield",
             "modeledGrowthHoursPerCalendarDay": hours,
