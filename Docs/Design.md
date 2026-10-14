@@ -39,6 +39,8 @@ Game `growDays` is **not calendar days**: temperature, soil fertility and outdoo
 
 `loadFolders.xml` loads `/` for 1.6 and `Compatibility/MedievalOverhaul` only when `DankPyon.Medieval.Overhaul` is active. Root `/Patches/` only references Vanilla Defs. Optional loadAfter entries are ordering hints, not hard dependencies. Normal RimWorld patching can conflict with another Mod writing the same `plant/growDays`; final loaded Def validation is mandatory. Both this Mod and old Grains builds may temporarily contain the same 13 crop patches; use an updated Grains checkout before testing clean ownership.
 
+**収量の初期監査（非確定値）：** 提供されたMO 1.6原本から収穫数・一部食品の明示的な栄養値を抽出し、`harvestYield/growDays` の相対指数を [PreliminaryHarvestProductivity-20261014.md](Balance/PreliminaryHarvestProductivity-20261014.md) に記録。レンズ豆の採用後の静的指数は1.25個/成長日、カボチャは既存2.5個/成長日。ただし実際の年間収穫数・労働・料理後の栄養量ではなく、追加の数値変更はまだ決定しない。
+
 ## Acceptance
 
 - Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.
