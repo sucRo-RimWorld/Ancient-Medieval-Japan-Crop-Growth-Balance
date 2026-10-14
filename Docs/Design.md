@@ -43,6 +43,8 @@ Game `growDays` is **not calendar days**: temperature, soil fertility and outdoo
 
 **Grains同時ロードでの所有境界テスト（RimWorld 1.6実施済み、厳格2/4）：** [Project Linux実ゲーム #38577898742](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38577898742)（artifact **11900508581**、CGB `f4f5d1a61162b199ecea087fe8f5dc765b386511`、Grains `6cfd4417020caf55facb86233ae8ea02a00560a3`、Project `215a4f457874475fd23cd4b981c13245b5c7fc0b`）にて、実Grains＋CGBをVanilla/CCTO/MO/MO+CCTOの四構成に同時ロード。所有作物CGB Vanilla6＋任意MO7、Grains独立5穀＋`Plant_Rice=5`＋MO/非MO小麦12を実ロード後に確認し、Pickle**各1/1 PASS・終了0**。Unity ERROR**0/0/2/2**（MO系は元のFMOD unsupported-formatエラー）につき厳格判定**2/4 PASS、総合ワークフローFAIL**。対象`growDays`の同時ロード競合は検出されないが、Grains併用時の実Pawn播種・加工・季節生産量・労働、1.7、MO系ERROR0は未検証または未達成。必須依存・Grains所有作物への追加パッチは行わない。詳細は [Native16-CropGrowth](Testing/Native16-CropGrowth-20261014.md)。
 
+**実Pawn JobDriverの作業tick検証（2026-10-14）：** [Project 1.6 #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173)、artifact **11905262794** では、Vanilla Potato/MO LentilsのSoil/Gravel/SoilRich元地形と、MO Tomatoの同一株2回収穫について真の`TickManager.DoSingleTick`消費tickを測定。全4構成Pickle各1/1 PASSだが厳格ERROR0は2/4（MO各FMOD2、総合FAIL）。**初回Soil播種は移動距離が長く、以降は作物近くから開始するため、肥沃度間のJob時間比較は未成立。** 収量・全15作物の実作業、季節を通した生産性、加工栄養は確定しない。数値は [数値監査](Balance/PreliminaryHarvestProductivity-20261014.md)、正確な実ゲーム証拠は [Native16 CropGrowth](Testing/Native16-CropGrowth-20261014.md) を参照。
+
 ## Acceptance
 
 - Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.

@@ -189,3 +189,28 @@ All four source-owned scenarios passed with no failed/skipped/flaky tests or tim
 - **Observed across all 15 unique original crop Defs:** `sowWork=170`, `harvestWork=200`, `firstCycleBaseWork=370`; every one recorded `AMJ_CROP_LOADED_RESOURCE` in original MO profiles, 6 Vanilla values also match both non-MO profiles. Lentils yield10×nutrition.05 = **0.50**/370 = **0.001351** raw Nutrition/base work; unchanged pumpkins yield20×.05 = **1.00**/370 = **0.002703**; unchanged cabbage 10×.05 = **0.50**/370. Vanilla corn 22×.05=1.10/370=0.002973 versus potato 11×.05=.55/370=.001486 but takes 13 versus 6 growth days. MO cotton harvest resource differs; all other claimed raw numbers retained from actual logs.
 - **Exclusions:** Real Pawn tick labor, mature-harvest calendars for the entire 15-crop set, research gates, repeated tomato cycles under trellis, processed nutrition/recipes, terrain distribution, daily weather, 1.7 and strict original-MO ERROR0 remain OPEN. Full 15-row quantitative interpretation is in [PreliminaryHarvestProductivity](../Balance/PreliminaryHarvestProductivity-20261014.md). No production XML numerical change.
 
+## Native Pawn JobDriver tick measurements #38585842173 — bounded 1.6 soil/movement control (2026-10-14)
+
+**Exact actual run:** [Project Linux Actions #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173), full artifact **11905262794**. Crop source `83c0d2fc34b32760fadae84f8dcdebe9fcb0e51f`, Project runner `41e5aa1b713cfc90de9f106463cb26e4b430bcd5`, original source-owned unmodified 1.6 MO/CCTO providers, game **RimWorldLinux 1.6.4871 rev600**. Source-owned `CropGrowthFieldSteps.cs` now counts **real `TickManager.DoSingleTick()` calls executed while a single trained Pawn's original `JobDefOf.Sow` or `HarvestDesignated` JobDriver is active**. This differs fundamentally from the prior 15 crops' loaded `sowWork=170`, `harvestWork=200` first-cycle base-work number; those game XML values are not observed Pawn ticks.
+
+| Actual profile | Crop | Original soil | Actual sow ticks | Actual harvest ticks | Total | Actual harvested count |
+|---|---|---|---:|---:|---:|---:|
+| Vanilla | Potato | Soil 100% (first job) | 331 | 87 | 418 | 14 |
+| Vanilla | Potato | Gravel 70% | 72 | 87 | 159 | 14 |
+| Vanilla | Potato | SoilRich 140% | 72 | 87 | 159 | 15 |
+| Vanilla+CCTO | Potato | Soil 100% (first job) | 352 | 90 | 442 | 15 |
+| Vanilla+CCTO | Potato | Gravel 70% | 75 | 90 | 165 | 15 |
+| Vanilla+CCTO | Potato | SoilRich 140% | 75 | 90 | 165 | 15 |
+| MO | Lentils | Soil 100% (first job) | 329 | 87 | 416 | 14 |
+| MO | Lentils | Gravel 70% | 72 | 84 | 156 | 13 |
+| MO | Lentils | SoilRich 140% | 72 | 87 | 159 | 13 |
+| MO+CCTO | Lentils | Soil 100% (first job) | 341 | 90 | 431 | 13 |
+| MO+CCTO | Lentils | Gravel 70% | 75 | 90 | 165 | 14 |
+| MO+CCTO | Lentils | SoilRich 140% | 75 | 90 | 165 | 14 |
+
+**Critical confounding:** The initial 100% Soil sow is the *first* job and includes long movement from the Pawn's initial location. Later 70%/140% sow jobs start near the crop cell. They are **not** matched travel-distance replicates, so differences in `combinedJobTicks` and the derived `rawNutritionStatPerJobTick` cannot be interpreted as fertility-driven labor-efficiency effects. Crop and CCTO profile Pawns are randomly generated (Plants20 but differing harvest modifier), and one job per soil is not an average or controlled population estimate. These measurements establish feasibility/instrumentation and concrete single-job observations only.
+
+**MO tomato:** Original living tomato on controlled test map (not sown on a real vine post): first and second native Pawn harvests required 87/87 ticks under MO, 90/90 under MO+CCTO. The same living plant survived and the **second sowing count is 0** in this bounded repeated-harvest experiment. No time to maturity measured by whole-world natural ticks, real vine-post research/bills, or field/economy throughput implied.
+
+**Strict runtime matrix:** Four original profile Pickle scenarios each **1/1 PASS**, process exit0, not timed out; Unity ERROR0 only Vanilla and Vanilla+CCTO, and **two independent original FMOD unsupported-audio ERRORs each in MO and MO+CCTO**. Strict profile outcome **2/4 PASS, overall workflow FAIL**. This is not a release or 4/4 zero-error claim; original unmodified audio remains. Covered job tick counts (Potato/Lentils and MO tomato only) cannot stand in for Pawn work of the other 12 comparison plants, full cultivation periods, the edible grain/meal chain, worker travel under standardized start positions, or natural whole-season simulations. No production crop values changed.
+
