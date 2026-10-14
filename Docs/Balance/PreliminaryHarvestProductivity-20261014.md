@@ -1,5 +1,15 @@
 # Vanilla/MO crop gross-yield baseline — 2026-10-14
 
+## 2026-10-14 Pawn作業tick実測（限定的な1株、15作物全体ではない）
+
+[Project Actions #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173)（artifact **11905262794**、Crop source `83c0d2fc34b32760fadae84f8dcdebe9fcb0e51f`）で実際の`TickManager.DoSingleTick`を使い、1.6の元のジャガイモ／MOレンズ豆の実播種・収穫Job実行tickを取得。元の3種類の土壌で両作物ともPickle PASS（全4構成）、ただしMO系は既知FMOD ERROR各2で厳格2/4・ワークフローFAIL。
+
+- Vanillaジャガイモ: Soil初回331+87=418tick、Gravel 72+87=159tick、SoilRich 72+87=159tick。CCTO併用は442/165/165tick。
+- MOレンズ豆: Soil初回329+87=416tick、Gravel 72+84=156tick、SoilRich 72+87=159tick。MO+CCTOは431/165/165tick。
+- MOトマトの実Pawn収穫1回目・同一株2回目は87/87tick、MO+CCTOでは90/90tick。2回目は再播種不要だが、支柱播種と自然季節は未検証。
+
+**比較の重要な制限：** 初回Soil播種はPawnの出発点からの移動が長く、後続のGravel/SoilRichは圃場の近くからのJob開始。**同じ距離条件でないため418対159の差を土壌肥沃度の労働効率と見なさない。** Pawn個体の収穫補正も異なり、各行1回だけ。基準`sowWork=170`+`harvestWork=200`=370とPawn JobDriverの実消費tickは異なる測定であり、置換も直接比較もしない。原料Nutrition/tick指数は直接可食・加工・運搬・研究・長期間の季節効率ではない。数値調整は認めず、次段階は**移動開始位置を揃えた反復試験＋実ゲーム時刻で進む全マップ作期**を検証する。
+
 ## 2026-10-14 実ロード播種・収穫の基準作業量と収穫指数（15作物）
 
 [Project isolated Linux 1.6 native run #38583040669](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38583040669)、CGB `f6e8190a60795b2195642ffcc76b2099d950e1cc`, Project `cdfbed1837f0edc47fc574a89ace203b5968aa39`, RimWorldLinux 1.6.4871 rev600, archived original-provider logs **11904645097**。変更13作物と、MOで未変更のキャベツ・カボチャ2作物について、実ロード済み`PlantProperties.sowWork`・`harvestWork`・`harvestYield`・収穫物`Nutrition`を取得。全4構成で各1/1 Pickle PASS、実ゲーム終了0。ただし元のMOプロバイダーを含む2構成ではFMODエラー各2件、**厳格判定2/4、ワークフローFAIL**。元の音声を変換・無効化した構成の結果ではない。
