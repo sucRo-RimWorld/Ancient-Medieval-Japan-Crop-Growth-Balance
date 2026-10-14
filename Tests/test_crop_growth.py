@@ -51,6 +51,24 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertIn(Path("CropGrowthBalance.xml"), base_paths)
         self.assertIn(Path("MOCropGrowthBalance.xml"), mo_paths)
 
+    def test_native_field_sources_are_isolated_development_only(self):
+        feature = (ROOT / "Tests/E2E/crop-growth-field-16.feature").read_text()
+        step = (ROOT / "Tests/E2E/CropGrowthFieldSteps.cs").read_text()
+        quick = (ROOT / "Tests/E2E/CropGrowthFieldQuickstart.cs").read_text()
+        self.assertIn("@quickstart:CropGrowthFieldQuickstart", feature)
+        self.assertEqual(feature.count("Scenario:"), 1)
+        self.assertIn("WorkGiver_GrowerSow", step)
+        self.assertIn("JobDefOf.Sow", step)
+        self.assertIn("WorkGiver_PlantsCut", step)
+        self.assertIn("JobDefOf.HarvestDesignated", step)
+        self.assertIn("planted.TickLong()", step)
+        self.assertIn("j == 300", step)
+        self.assertIn("j == 600", step)
+        self.assertIn("simulatedGrowthOnly=true", step)
+        self.assertIn("class CropGrowthFieldQuickstart : AbstractQuickstart", quick)
+        self.assertNotIn("CropGrowthFieldSteps", (ROOT / "loadFolders.xml").read_text())
+        self.assertNotIn("CropGrowthFieldQuickstart", (ROOT / "loadFolders.xml").read_text())
+
     def test_conditional_loader_and_unique_packageid(self):
         loader = ET.parse(ROOT / 'loadFolders.xml').getroot()
         self.assertEqual(loader.tag,'loadFolders')
