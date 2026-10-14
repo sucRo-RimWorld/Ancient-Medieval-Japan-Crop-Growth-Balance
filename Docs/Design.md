@@ -42,6 +42,7 @@ Game `growDays` is **not calendar days**: temperature, soil fertility and outdoo
 ## Acceptance
 
 - Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.
+- Source-owned `Tests/E2E/CropGrowthBalanceSteps.cs` + `Tests/E2E/crop-growth-16.feature` define one strict loaded-Def native scenario per profile. The four native runs must load this Mod's source-pinned real XML and check exact 6 Vanilla values, the additional 7 MO values when MO is present, actual requested MO/CCTO provider identities and no Grains shortcut. A Pickle scenario PASS alone is insufficient: require complete game exit 0, native ERROR0, and independent version/source/log/summary evidence.
 - Four 1.6 profiles: Vanilla, Vanilla+CCTO, MO, MO+CCTO. For each, check loaded target values and native ERROR0 logs; check sow, harvest and a 10/20-day temperature/fertility growth matrix. Grains-alone and Crop Balance-alone must be distinguishable, and Grains+Crop Balance must preserve Grains' seven crops and return corrected lentils only when Crop Balance is loaded.
 - Confirm 1.7 actual upstream Defs and loadFolders semantics independently before claiming 1.7 support. Do not inherit old Grains game-test successes as new-Mod acceptance.
 - Author-only distribution and private play until normal release gates are met.
