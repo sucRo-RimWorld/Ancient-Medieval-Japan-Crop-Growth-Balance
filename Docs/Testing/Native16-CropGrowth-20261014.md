@@ -1,3 +1,18 @@
+## Matched-calendar real fertility harvest #38570534129 — four native Pickle PASS (2026-10-14)
+
+**Provenance:** [Project 1.6 Linux run #38570534129](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38570534129), artifact **11898411270**; owner source `7a3c7a745deecd0ba0e58d0a207b9f10e2bf1ca6`, Project host `236002bcf7ba4be28d1b4d3ad5e6573202d73cc3`, native RimWorld `1.6.4871 rev600`. Original Gravel=70%, Soil=100%, SoilRich=140%, native Pawn Sow/Harvest jobs and original Potato or MO Lentils, 25°C and original plant growth `Plant.TickLong` with 2,000-tick steps. Within each profile, baseline 100% Soil, later 70% Gravel and 140% SoilRich growth samples started at **exactly the same `matchedGrowthCalendar`** (reported per profile as 15342/15414/15342/15318 game ticks). These are controlled *plant-only* 10/20/30-day growth measurements, NOT full world/map/colony seasons.
+
+| Profile | 10-day growth on 70% / 100% / 140% | 20-day growth on 70% / 100% / 140% | Original 70% / 100% / 140% actual harvested items |
+|---|---|---|---|
+| Vanilla Potato | 0.5956 / 0.6768 / 0.7851 | 1.0000 / 1.0000 / 1.0000 | 15 / 15 / 15; base yield 11, Pawn yield stat 1.1232 |
+| Vanilla+CCTO Potato | 0.5955 / 0.6767 / 0.7850 | 1.0000 / 1.0000 / 1.0000 | 13 / 14 / 14; base 11, Pawn stat 1.0215 |
+| MO Lentils | 0.4011 / 0.5076 / 0.6498 | 0.8540 / 1.0000 / 1.0000 | 14 / 13 / 14; base 10, Pawn stat 1.1300 |
+| MO+CCTO Lentils | 0.4011 / 0.5077 / 0.6498 | 0.8542 / 1.0000 / 1.0000 | 14 / 13 / 14; base 10, Pawn stat 1.1300 |
+
+- Growth consistently increases with real fertility under **matched start sky/time**, independently of CCTO at controlled 25°C. Lentils on Gravel are below full growth at simulated day20 (about 0.854); in the native `>=0.999` measurement their first near-full maturity was step **691** on Gravel (about 23.0 calendar days) vs step **449** on SoilRich (about 15.0 calendar days). Potato recorded the same first-threshold steps **482** on Gravel (16.1 days) and **384** on SoilRich (12.8 days). Those are **controlled threshold observations**, not earliest valid harvest times or real days-to-harvest in ordinary weather.
+- All four original-provider Pickle scenarios **1/1 PASS**, game exit0. Unity ERROR0 for Vanilla/CCTO, but both MO profiles retain independent 2 upstream FMOD errors, so **overall GitHub workflow FAIL and only two strict profile PASS**; no waivers.
+- The numbers are each **one plant, one qualified Pawn** per terrain/profile, no sample mean, no natural calendar/weather/migration, food Nutrition, transport or processing labor. Native tomato two-harvest source-owned assertions remain PASS in both MO profiles; trellis planting, 50% native sow, Grains loaded coexistence and 1.7 remain untested. The initial *different-start-date* soil growth comparison in #38568822665 is superseded for controlled rate comparisons **only** by the matched-calendar run here; its real original sow/harvest Job evidence remains valid. All 13 `growDays` and `harvestYield` production values unchanged.
+
 # Crop Growth Balance — Linux 1.6 native loaded-Def evidence (2026-10-14)
 
 **Owner:** AMJ Crop Growth Balance. **Canonical growth-day numerical contract:** [Design.md](../Design.md), `Patches/CropGrowthBalance.xml` and `Compatibility/MedievalOverhaul/Patches/MOCropGrowthBalance.xml`. This report records actual runtime results; it is not approval for full native or season/yield release.
