@@ -78,8 +78,11 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 oldTicks = Find.TickManager.TicksGame;
                 oldTemperature = map.Biome.constantOutdoorTemperature;
                 oldSky = map.skyManager.CurSkyGlow;
-                cell = map.Center + new IntVec3(3, 0, 3);
-                ctx.Require(cell.InBounds(map) && !cell.Roofed(map), "Open field fixture unavailable");
+                cell = CellRect.CenteredOn(map.Center, 7).Cells.FirstOrDefault(c =>
+                    c.InBounds(map) && !c.Roofed(map) && c.Standable(map) &&
+                    !c.GetThingList(map).Any(t => t is Pawn || t is Building));
+                ctx.Require(cell.InBounds(map) && !cell.Roofed(map) && cell.Standable(map),
+                    "Open and pawn-safe field fixture unavailable");
                 oldTerrain = map.terrainGrid.TerrainAt(cell);
                 oldSnow = map.snowGrid.GetDepth(cell);
                 Find.TickManager.CurTimeSpeed = TimeSpeed.Paused;
