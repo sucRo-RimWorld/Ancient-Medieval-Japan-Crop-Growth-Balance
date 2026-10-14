@@ -73,6 +73,9 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertIn('ProbeRealTerrainHarvest("Gravel", .7f)', step)
         self.assertIn('ProbeRealTerrainHarvest("SoilRich", 1.4f)', step)
         self.assertIn("AMJ_CROP_SOIL_REAL_HARVEST", step)
+        self.assertIn("matchedGrowthCalendar = initialCalendar", step)
+        self.assertIn("initial = matchedGrowthCalendar", step)
+        self.assertIn("AMJ_CROP_SOIL_BASELINE_CALENDAR", step)
         self.assertIn("realPawnSow=true realPawnHarvest=true", step)
         self.assertIn("worldSeasonTicked=false", step)
 

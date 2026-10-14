@@ -66,6 +66,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
             private readonly Stopwatch deadline = Stopwatch.StartNew();
             private readonly TimeSpeed previousSpeed;
             private readonly int oldTicks;
+            private int matchedGrowthCalendar = -1;
             private readonly float? oldTemperature;
             private readonly float oldSky;
             private readonly IntVec3 cell;
@@ -410,7 +411,15 @@ namespace AMJ.CropGrowthBalance.NativeTests
                     planted = cell.GetPlant(map);
                     ctx.Require(planted != null && planted.Spawned && planted.sown &&
                         planted.Growth < 1f, "Real job did not plant a growing crop: " + terrainName);
-                    initial = Find.TickManager.TicksGame;
+                    ctx.Require(matchedGrowthCalendar >= 0,
+                        "100%-Soil native reference calendar was not captured");
+                    // Make 70%, 100% and 140% plant-only growth samples start
+                    // at exactly the same game tick and outdoor sky phase.
+                    // Pawn sow/harvest jobs remain truly executed; whole world
+                    // is NOT simulated across calendar seasons here.
+                    initial = matchedGrowthCalendar;
+                    Find.TickManager.DebugSetTicksGame(initial);
+                    map.skyManager.ForceSetCurSkyGlow(GenCelestial.CurCelestialSunGlow(map));
                 });
                 float growth10 = 0f, growth20 = 0f, growth30 = 0f;
                 int maturityStep = -1;
@@ -467,6 +476,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                     Log.Message("AMJ_CROP_SOIL_REAL_HARVEST profile=" + profile +
                         " crop=" + crop.defName + " terrain=" + terrainName +
                         " fertility=" + expectedFertility.ToString("F2") +
+                        " matchedGrowthCalendar=" + initial +
                         " growth10=" + growth10.ToString("F4") +
                         " growth20=" + growth20.ToString("F4") +
                         " growth30=" + growth30.ToString("F4") +
@@ -512,7 +522,14 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 // 10/20-day colony simulation.
                 float at10 = 0f, at20 = 0f;
                 int initialCalendar = 0;
-                await RuntimeThread.Run(() => initialCalendar = Find.TickManager.TicksGame);
+                await RuntimeThread.Run(() =>
+                {
+                    initialCalendar = Find.TickManager.TicksGame;
+                    matchedGrowthCalendar = initialCalendar;
+                    Log.Message("AMJ_CROP_SOIL_BASELINE_CALENDAR profile=" + profile +
+                        " crop=" + crop.defName +
+                        " matchedGrowthCalendar=" + initialCalendar);
+                });
                 for (int k = 1; k <= 600; k += 30)
                 {
                     int start = k;
