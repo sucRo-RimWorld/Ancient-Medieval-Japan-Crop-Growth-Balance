@@ -11,6 +11,29 @@ using Verse.AI;
 
 namespace AMJ.CropGrowthBalance.NativeTests
 {
+    // Standalone copy of the proven Grains StageASteps main-thread dispatcher.
+    // Never execute Verse map/job mutations on Pickle's background test thread.
+    internal static class RuntimeThread
+    {
+        public static Task Run(Action work)
+        {
+            var done = new TaskCompletionSource<bool>();
+            Action invoke = delegate
+            {
+                try
+                {
+                    if (!UnityData.IsInMainThread)
+                        throw new InvalidOperationException("Crop test work must run on Unity main thread");
+                    work();
+                    done.SetResult(true);
+                }
+                catch (Exception error) { done.SetException(error); }
+            };
+            RimWorks.Pickle.Runtime.PickleDriver.Post(invoke);
+            return done.Task;
+        }
+    }
+
     // TEST-ONLY. The map is a disposable Quickstart: production crop XML
     // and the player's saves/settings are not modified.
     [PickleSteps]
@@ -43,7 +66,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
             private readonly Stopwatch deadline = Stopwatch.StartNew();
             private readonly TimeSpeed previousSpeed;
             private readonly int oldTicks;
-            private readonly float oldTemperature;
+            private readonly float? oldTemperature;
             private readonly float oldSky;
             private readonly IntVec3 cell;
             private readonly TerrainDef oldTerrain;
