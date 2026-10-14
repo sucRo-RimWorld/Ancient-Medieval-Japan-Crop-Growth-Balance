@@ -48,6 +48,8 @@
 
 **原本土壌での実収穫（2026-10-14、観測と制約）：** [Project #38568822665](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38568822665)（artifact 11897140747、owner `718c0bff6edda79390f6328d2796bf1c991c4c88`）で、ジャガイモ・レンズ豆を実際のPawnがGravel **70%**・Soil **100%**・SoilRich **140%**で播種し収穫した。全4構成Pickle 1/1 PASS、Unity ERRORは0/0/2/2でMOのFMODによるstrict FAILは継続。70/100/140%順の単株収穫数：ジャガイモVanilla **16/16/15**、Vanilla+CCTO **14/14/14**、レンズ豆MO **14/13/13**、MO+CCTO **13/14/14**。構成内は同じ実Pawnを使用。ただし**元の試験では土壌ごとに成長暦の開始日が異なり、季節の天空光が混入**したため、土壌ごとの*成長速度の優劣*はまだ採用しない。生育時の開始tickを共通化した正本[Native16-CropGrowth](../Testing/Native16-CropGrowth-20261014.md)の再実行結果が必要。50%肥沃度の実播種、MO支柱の実播種、Grains併用、自然季節の収量・加工労働は未検証。**今回も数値変更を承認しない**。
 
+**条件を統一した実成長比較・収穫（2026-10-14）：** [Project #38570534129](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38570534129)（artifact 11898411270、owner `7a3c7a745deecd0ba0e58d0a207b9f10e2bf1ca6`）で、70%・100%・140%土壌それぞれの植物制御暦**開始tickと空光を一致**させた。実Pawnの播種・収穫Jobは4構成とも1/1 Pickle PASS。10暦日後の成長率（70/100/140順）：ジャガイモVanilla `0.5956/0.6768/0.7851`、Vanilla+CCTO `0.5955/0.6767/0.7850`、レンズ豆MO `0.4011/0.5076/0.6498`、MO+CCTO `0.4011/0.5077/0.6498`。**等時点では肥沃度の上昇と成長率の増加が整合**。レンズ豆の70%は20日目も約85.4%、140%は20日以内に成熟。70/100/140%各単株の実収穫数はジャガイモVanilla `15/15/15`、CCTO `13/14/14`、レンズ豆MO・MO+CCTOとも `14/13/14`。同構成では同じ実Pawnだが収量は平均ではない。Unity ERRORはVanilla/CCTO 0、MO/MO+CCTO 2（既知FMOD）のため**厳格受入は依然FAIL**。自然季節全体は進めておらず、季節を通じた年間生産性、研究支柱でのトマト実播種、Grains併用、作業/料理後Nutritionは未検証。追加数値変更は未採用。[詳細](../Testing/Native16-CropGrowth-20261014.md)。
+
 ### 次の数値判断ゲート（未採用の感度分析）
 
 **数値修正の優先検証対象はレンズ豆・カボチャ・トマト**。現行の確定生育日数13件はいったん維持し、以下の例は**承認値ではなく単純な感度分析**として扱う。
