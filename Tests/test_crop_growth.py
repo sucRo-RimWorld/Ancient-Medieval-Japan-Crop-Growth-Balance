@@ -97,6 +97,11 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertIn("harvested.GetStatValueAbstract(StatDefOf.Nutrition)", step)
         self.assertIn("thing.plant.harvestYield", step)
         self.assertIn("thing.plant.fertilityMin", step)
+        for expected in ("thing.plant.sowWork", "thing.plant.harvestWork",
+                         "firstCycleBaseWork=", "rawNutritionPerBaseWork=",
+                         "firstHarvestOnly=true actualPawnWork=false",
+                         "processingWorkExcluded=true directEdibilityUnverified=true"):
+            self.assertIn(expected, step)
         self.assertIn('Check(ctx, "DankPyon_Plant_Cabbages", 8f)', step)
         self.assertIn('Check(ctx, "DankPyon_Plant_Pumpkins", 8f)', step)
         self.assertIn("Original MO controls, not modified", step)

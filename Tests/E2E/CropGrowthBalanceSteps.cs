@@ -73,15 +73,36 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 if (harvested != null)
                 {
                     float rawNutrition = harvested.GetStatValueAbstract(StatDefOf.Nutrition);
+                    float sowWork = thing.plant.sowWork;
+                    float harvestWork = thing.plant.harvestWork;
+                    float baseCycleWork = sowWork + harvestWork;
                     ctx.Assert(!float.IsNaN(rawNutrition) && rawNutrition >= 0f,
                         name + " harvested item has invalid Nutrition");
+                    ctx.Assert(!float.IsNaN(sowWork) && !float.IsInfinity(sowWork) &&
+                        sowWork > 0f, name + " loaded sowWork is invalid");
+                    ctx.Assert(!float.IsNaN(harvestWork) && !float.IsInfinity(harvestWork) &&
+                        harvestWork > 0f, name + " loaded harvestWork is invalid");
+                    ctx.Assert(!float.IsInfinity(baseCycleWork) && baseCycleWork > 0f,
+                        name + " first-cycle base work invalid");
+                    float grossRawNutrition = thing.plant.harvestYield * rawNutrition;
+                    float rawNutritionPerBaseWork = grossRawNutrition / baseCycleWork;
+                    // Original loaded Def work units before pawn skill/movement/haul/processing.
+                    // Nutrition is an inherited stat, not evidence of direct edibility.
+                    // Reharvestable plants (e.g. MO tomato) must NOT be modeled as
+                    // needing sowWork on every harvest from this first-cycle proxy.
                     Log.Message("AMJ_CROP_LOADED_RESOURCE crop=" + name +
                         " growDays=" + thing.plant.growDays.ToString("F4", CultureInfo.InvariantCulture) +
                         " harvestYield=" + thing.plant.harvestYield.ToString("F4", CultureInfo.InvariantCulture) +
                         " harvestedThing=" + harvested.defName +
                         " rawNutrition=" + rawNutrition.ToString("F4", CultureInfo.InvariantCulture) +
                         " fertilityMin=" + thing.plant.fertilityMin.ToString("F4", CultureInfo.InvariantCulture) +
-                        " sowMinSkill=" + thing.plant.sowMinSkill);
+                        " sowMinSkill=" + thing.plant.sowMinSkill +
+                        " sowWork=" + sowWork.ToString("F4", CultureInfo.InvariantCulture) +
+                        " harvestWork=" + harvestWork.ToString("F4", CultureInfo.InvariantCulture) +
+                        " firstCycleBaseWork=" + baseCycleWork.ToString("F4", CultureInfo.InvariantCulture) +
+                        " grossRawNutritionFirstHarvest=" + grossRawNutrition.ToString("F4", CultureInfo.InvariantCulture) +
+                        " rawNutritionPerBaseWork=" + rawNutritionPerBaseWork.ToString("F6", CultureInfo.InvariantCulture) +
+                        " firstHarvestOnly=true actualPawnWork=false processingWorkExcluded=true directEdibilityUnverified=true");
                 }
             }
         }
