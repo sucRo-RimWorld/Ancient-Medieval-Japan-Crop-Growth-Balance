@@ -31,6 +31,16 @@ class CropBalanceAuditTests(unittest.TestCase):
         self.assertFalse(tomato['postHarvestPersistenceNativeVerified'])
         self.assertEqual(tomato['idealFullHarvestsIn20Days'], 1)
 
+    def test_mo_explicit_nutrition_is_not_inherited_nutrition(self):
+        rows = {r["defName"]: r for r in audit()["cropRows"]}
+        tomato = rows["DankPyon_Plant_Tomatoes"]
+        self.assertIsNone(tomato["rawNutritionExplicitInMO16"])
+        self.assertIsNone(tomato["grossRawNutritionPerGrowthDayIfExplicit"])
+        self.assertFalse(tomato["loadedNutritionVerified"])
+        self.assertEqual(rows["DankPyon_Plant_Lentils"]["rawNutritionExplicitInMO16"], .05)
+        self.assertEqual(rows["DankPyon_Plant_Lentils"]["grossRawNutritionPerGrowthDayIfExplicit"], .0625)
+        self.assertEqual(rows["DankPyon_Plant_Pumpkins"]["grossRawNutritionPerGrowthDayIfExplicit"], .125)
+
     def test_fertility_factors_are_not_sowability(self):
         rows = {r['defName']: r for r in audit()['cropRows']}
         self.assertEqual(rows['Plant_Potato']['fertilityFactors']['0.5'], .8)
