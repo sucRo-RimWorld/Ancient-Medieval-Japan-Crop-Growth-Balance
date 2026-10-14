@@ -1,19 +1,20 @@
 # Ancient & Medieval Japan - Crop Growth Balance — 設計書
 
-**Status:** 2026-10-14, independent **RimWorld 1.6 development build only**. Four real-provider 1.6 profiles now confirm the source-owned *loaded growth-day* assertions (one Pickle scenario each, all PASS), **but strict game acceptance is only Vanilla and Vanilla+CCTO (ERROR0)**; MO and MO+CCTO both retain **2 Unity FMOD ERROR** per profile, so the overall native test workflow is FAIL. See [Native16-CropGrowth-20261014.md](Testing/Native16-CropGrowth-20261014.md) for exact source/game/run/evidence. Native real-pawn sow/harvest, matched-calendar original 70/100/140% terrain growth sampling, repeated same-tomato harvesting and Grains+CGB loaded-Def coexistence have all passed their separately pinned 1.6 Pickle assertions; combined actual food/labor seasons and 1.7 remain unverified. Real loaded sow/harvest base work was additionally verified for 15 comparison plants by [Project #38583040669](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38583040669), but it does **not** measure Pawn job ticks or alter approved balance. Steam/2game publication is not approved. Original values derive from Grains PR #99 and are now owned by this dedicated repository. Grains extraction is PR #101 (main `b62d8ec9ee97b50eaa1043b9d51a44e4d1d412c3`).
+**対象:** RimWorld 1.6。バニラ6作物と任意導入のMedieval Overhaul（MO）7作物。実装は `growDays` のXML置換のみ。1.7は未対応・未検証。
 
-## Scope and responsibilities
+## 目的・評価基準（2026-10-15 作者確定）
 
-- Own existing **Vanilla/MO** crop maturation and, after a separate quantitative review, crop harvest-yield balance as a stand-alone optional XML patch Mod. **Current V1 development implementation changes growth days only**, with yield unchanged. No dependency on Grains, CCTO, Environment or MO. MO definitions are patched only if MO is active.
-- Own the named 13 `growDays` overrides below; this does not add new plants, foods, research or workstations.
-- **Grains** owns its seven-grain PlantDefs and their internal crop balance, Vanilla `Plant_Rice` shared upland crop, and conditional MO `DankPyon_Plant_Wheat` integration. These two PlantDefs are excluded from this Mod.
-- **CCTO** owns Vanilla/MO low-temperature survival/seasonal death and framework data; this Mod does not modify it.
-- **Environment** owns terrain, geography and natural vegetation; this Mod has no environment requirements.
-- Future bean/root/fiber crop Mods may use the same balance principles without importing a mandatory runtime dependency. The numerical reference is conceptual only, not shared game data.
+**AMJ Grainsで採用した穀物のゲーム内生育期間を基準に、バニラ・MOの既存作物の相対的な生育期間を合わせる**ことが目的。CCTOのような温度・枯死・休眠ルールの調整ではない。
 
-## PlantDefs and exact `growDays` values
+- AMJ Grainsが所有する七穀の生育日数は、アワ6・ヒエ6・キビ5・ソバ4・大麦10・小麦12・稲5。Grains内の加工・用途・土地条件を考慮して設定された値を比較の**基準**とする。これらの数値をこのModから変更しない。
+- 既存作物13件は、Grains作物との相対的な早晩差が不自然にならないように調整する。現実の成熟期間は参考資料であり、現実の日数を `growDays` に直接変換しない。
+- 作物の収穫数、栄養、加工の有無、労働量を一律に均等化しない。現バージョンで `harvestYield`・研究・播種条件・温度・品目・料理・画像を変更しない。将来の収穫量調整は独立の新規仕様決定がある場合だけ検討する。年間カロリー/面積/労働の精密モデルは**初回完成条件から除外**。
+- 独立・任意のXML Modとし、Grains・MO・CCTOをハード依存にしない。Grainsなしでも使用できるが、**Grainsの作物バランスに合わせる併用Mod**であることを説明する。MOが有効な場合だけMOパッチをロードする。
+- Grainsが七穀、`Plant_Rice`と条件付きMO小麦を所有し、本Modはそれらに一切パッチしない。CCTOは低温・枯死・休眠を所有する。
 
-| Provider | PlantDef | Original 1.6 | AMJ Crop Growth Balance |
+## 採用 `growDays`（1.6）
+
+| 提供元 | PlantDef | 元の1.6 | 採用値 |
 |---|---|---:|---:|
 | Vanilla | `Plant_Potato` | 5.8 | **6** |
 | Vanilla | `Plant_Corn` | 11.3 | **13** |
@@ -29,33 +30,25 @@
 | MO | `DankPyon_Plant_Carrots` | 3.25 | **6** |
 | MO | `DankPyon_Plant_Tomatoes` | 4.25 | **7** |
 
-## What these values mean
+`growDays`は暦日ではなく、実際の成熟は気温・日照・土壌によって変わる。13件の相対値について明白な矛盾が見つからなければ現行値を維持し、収穫数等の精密な均衡調整は行わない。
 
-Game `growDays` is **not calendar days**: temperature, soil fertility and outdoor light/plant growth periods affect elapsed harvest days. Prefer agronomic relative maturity instead of direct Gregorian conversion. Numbers above are initial balance values; real harvest/food productivity and game experience remain unverified. Specifically MO lentils change `3 -> 8` with `harvestYield=10` unchanged.
+## 実装・互換性
 
-**This initial source does not modify** yields, harvested items, fertility, temperature, death thresholds, graphics, research, recipes, nutrition, existing PlantDefs or stored save DefName identities. Future yield rebalance, part of the repository-wide objective, requires a new accepted numeric design plus annual calorie/area/labor accounting before production edits. Vanilla rice remains assigned to Grains when installed; without Grains, Vanilla rice behaves normally. MO wheat remains MO-owned with Grains conditional specialization only when Grains is installed. Trees, medical/special plants and already acceptable growth periods are outside this initial scope.
+- 正本: `Patches/CropGrowthBalance.xml` と `Compatibility/MedievalOverhaul/Patches/MOCropGrowthBalance.xml`。
+- `loadFolders.xml` の1.6ルートと `IfModActive="DankPyon.Medieval.Overhaul"` によりMOパッチを任意適用する。異なるXML相対パスを維持すること。同名にするとMO用オーバーレイがバニラ用パッチを上書きした実績がある。
+- Grainsとの同時ロードではGrains七穀の設定を尊重し、バニラ・MO既存作物13件のみを変更する。
+- セーブ内の作物Def名、資源、研究やレシピを新設・変更しない。**既存セーブへの追加・削除テストは未実施**のため公開説明では互換性を断定しない。
+- 本番にはRimWorld実行時テスト用C#・Quickstart・Pickleを含めない。
 
-## Loading and compatibility
+## 完成・同時公開の条件（2026-10-15 作者確定）
 
-`loadFolders.xml` loads `/` for 1.6 and `Compatibility/MedievalOverhaul` only when `DankPyon.Medieval.Overhaul` is active. Root `/Patches/` only references Vanilla Defs. **The conditional MO Patch file must have a distinct relative filename** (`Patches/MOCropGrowthBalance.xml` rather than `Patches/CropGrowthBalance.xml`), because `loadFolders.xml` merges its later overlay and replaces files with identical relative paths. Actual 1.6 MO test initially showed `Plant_Potato=5.8` instead of 6 due to this collision, so `Tests/test_crop_growth.py` rejects any root/conditional relative-path overlap. This test applies only to the demonstrated file shadowing, not unrelated third-party load-order conflicts. Optional loadAfter entries are ordering hints, not hard dependencies. Normal RimWorld patching can conflict with another Mod writing the same `plant/growDays`; final loaded Def validation is mandatory. Both this Mod and old Grains builds may temporarily contain the same 13 crop patches; use an updated Grains checkout before testing clean ownership.
+1. 13件の値がGrains基準に概ね整合し、明白な取り違えがないこと。独自の歴史期間への厳密な換算や収量・栄養・Pawn作業時間の均等化は不要。
+2. 1.6バニラ・MO（任意）およびCCTO併用において、期待する13件がロードされ、播種・成長・収穫に**このMod由来の重大なバグが認められない**こと。Grainsとの競合がないこと。既存の個別機能テストを再利用し、不必要な全季節シミュレーション・精密労働解析・長期実プレイを求めない。
+3. 配布物、About、README、Workshop/2game原稿の機能・任意依存・対象バージョンが一致すること。実ゲームテスト未実施と記す古い説明は修正すること。
+4. **Grainsが公開可能になった時期に、Crop Growth Balanceも同時公開する。単独先行公開はしない。** Grainsの実プレイで独自作物を優先して検証しているため、CGB独自の長期実プレイは公開条件にしない。Steam/2gameへの投稿・可視性変更は、両Modの準備と公開手順が確認できた段階で別途実行する。
 
-**収穫数・生育期間の数値再評価（確定仕様の変更なし）：** [PreliminaryHarvestProductivity-20261014.md](Balance/PreliminaryHarvestProductivity-20261014.md) の第二次監査では、Vanilla 6・MO 7・MO未調整対照2の基準収穫数と生育日数、Grains七穀の加工差を比較した。13時間/日の理想日照モデルでは20暦日中のトウモロコシ13日・MOサトウキビ12日は満熟不可。MOレンズ豆10個/8日（1.250個/成長日）に対してMOカボチャ20個/8日（2.500個/成長日）だが、これのみで作物性能は確定しない。MOトマトの`harvestAfterGrowth=0.30`はMO/MO+CCTO両構成で**収穫後に株が生存しGrowth=0.3000**となることを実証した。Project [run #38565073363](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38565073363)（owner `5bb15ade9e6aae0c8e412047374ad9a1d0ad2f1a`）では同じ株を制御暦で成長させ、2回目の実Pawn収穫（MO10個／MO+CCTO11個）後もGrowth=0.3000を確認。**支柱への実播種・最短再収穫周期・全マップの季節/仕事量は未検証**なので、再成長率1.633を年間経済バランスの確定値としては採用しない。専用支柱`DankPyon_Post`＋中級農業研究が播種前提で、カボチャにも上級農業研究が必要。肥沃度50%の成長係数は播種可否の保証ではなく、Vanilla主要作物の最低肥沃度70%との区別が必要。**現行13件の`growDays`と全`harvestYield`は維持**し、採用前に実ゲーム収穫・加工後の栄養と労働、Grains共存、VE/非VEを検証する。
+## 現時点の1.6実機証拠と未達
 
-**Grains同時ロードでの所有境界テスト（RimWorld 1.6実施済み、厳格2/4）：** [Project Linux実ゲーム #38577898742](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38577898742)（artifact **11900508581**、CGB `f4f5d1a61162b199ecea087fe8f5dc765b386511`、Grains `6cfd4417020caf55facb86233ae8ea02a00560a3`、Project `215a4f457874475fd23cd4b981c13245b5c7fc0b`）にて、実Grains＋CGBをVanilla/CCTO/MO/MO+CCTOの四構成に同時ロード。所有作物CGB Vanilla6＋任意MO7、Grains独立5穀＋`Plant_Rice=5`＋MO/非MO小麦12を実ロード後に確認し、Pickle**各1/1 PASS・終了0**。Unity ERROR**0/0/2/2**（MO系は元のFMOD unsupported-formatエラー）につき厳格判定**2/4 PASS、総合ワークフローFAIL**。対象`growDays`の同時ロード競合は検出されないが、Grains併用時の実Pawn播種・加工・季節生産量・労働、1.7、MO系ERROR0は未検証または未達成。必須依存・Grains所有作物への追加パッチは行わない。詳細は [Native16-CropGrowth](Testing/Native16-CropGrowth-20261014.md)。
+原本MO・CCTOを用いた隔離Linux 1.6において、[生育日数の読み込み・実Pawn播種／収穫／生長](Testing/Native16-CropGrowth-20261014.md) と [Grains同時ロード](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38577898742) の個別Pickle検証は全4構成で成功。Grains同時ロードによる値の衝突も検出されていない。
 
-**実Pawn JobDriverの作業tick検証（2026-10-14）：** [Project 1.6 #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173)、artifact **11905262794** では、Vanilla Potato/MO LentilsのSoil/Gravel/SoilRich元地形と、MO Tomatoの同一株2回収穫について真の`TickManager.DoSingleTick`消費tickを測定。全4構成Pickle各1/1 PASSだが厳格ERROR0は2/4（MO各FMOD2、総合FAIL）。**初回Soil播種は移動距離が長く、以降は作物近くから開始するため、肥沃度間のJob時間比較は未成立。** 収量・全15作物の実作業、季節を通した生産性、加工栄養は確定しない。数値は [数値監査](Balance/PreliminaryHarvestProductivity-20261014.md)、正確な実ゲーム証拠は [Native16 CropGrowth](Testing/Native16-CropGrowth-20261014.md) を参照。
-
-**実世界tickの能力実証（2026-10-14）：** [Project実ゲーム #38588357603](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38588357603)、artifact **11907525113**。Vanillaジャガイモ1株を実Pawnが播種後、`TickManager.DoSingleTick`で世界・マップ・Pawnを60,000tick＝1暦日動かし、成長率**0.0001→0.0638**を確認。元の制御植物のみ`TickLong`と異なる。ただし外気温25℃固定、**収穫なし**、MO/CCTO側には本追加1日を実施していない。全四構成の既存Field Pickleは各1/1 PASS、厳格Unity ERROR0は2/4のみ（MO FMOD2ずつ）。10/20/30日自然気候・複数作期・食料/作業量経済はOPEN、数値変更を認める根拠にはならない。
-
-## Acceptance
-
-- Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.
-- Source-owned `Tests/E2E/CropGrowthBalanceSteps.cs` + `Tests/E2E/crop-growth-16.feature` define one strict loaded-Def native scenario per profile. The four native runs must load this Mod's source-pinned real XML and check exact 6 Vanilla values, the additional 7 MO values when MO is present, actual requested MO/CCTO provider identities and no Grains shortcut. A Pickle scenario PASS alone is insufficient: require complete game exit 0, native ERROR0, and independent version/source/log/summary evidence.
-- Four 1.6 profiles: Vanilla, Vanilla+CCTO, MO, MO+CCTO. For each, check loaded target values and native ERROR0 logs. Existing confirmed loaded-Def suite remains separately source-pinned.
-- **First field-productivity native gate (new):** Source-owned `Tests/E2E/CropGrowthFieldQuickstart.cs`, `crop-growth-field-16.feature`, `CropGrowthFieldSteps.cs` test actual grower `JobDefOf.Sow` and `HarvestDesignated` pawn jobs on a disposable 50×50 map using *original* `Plant_Potato` (no MO) and `DankPyon_Plant_Lentils` (with MO). At real Soil fertility 100%, 25 °C and scripted outdoor daylight, after native sow `Plant.TickLong` is invoked at every 2,000-tick interval with controlled calendar/sky state for samples at 10 and 20 days; no invented crop yield/plant Defs. Only a plant genuinely reaching maturity may be designated and harvested by a real pawn JobDriver. Report harvest items, source `harvestYield` and native fertility growth factors at 50/100/140%.
-- **Critical simulation boundary:** Advancing a controlled calendar and calling `Plant.TickLong` **does not run all other map/world/Pawn ticks for 10/20 calendar days**. This tests the real plant growth method and real sow/harvest Jobs but **not** whole-season farming economics, labor-time throughput, season events, long-term temperature/weather, natural-field crop cycles or nutrition from cooking. The original 70% Gravel, 100% Soil and 140% SoilRich **do have actual pawn sow and harvest Jobs** at native 1.6 ([run #38568822665](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38568822665)); however the initial plant-only growth samples used different starting game-calendar dates. Source now shares one starting tick/sky across all three fields, and **matched-calendar actual 1.6 four-profile Pickle PASS** is documented in [run #38570534129](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38570534129). At controlled day10, Potato Gravel/Soil/SoilRich growth=.5956/.6768/.7851 and MO Lentils=.4011/.5076/.6498; real sow and harvest succeed on all three native soils. MO FMOD ERROR2 still means strict overall workflow FAIL; no annual/whole-world simulation, average yield or nutrition economy is established. The new same-tomato controlled **second** Pawn harvest at original 100% Soil is a separate bounded native proof, not a full-season trial. The separate full seasonal/field-labor matrix remains OPEN. Grains-alone and Crop Balance-alone must be distinguishable, and Grains+Crop Balance must preserve Grains' seven crops and return corrected lentils only when Crop Balance is loaded.
-- **Loaded harvested-resource numerical probe (source prepared, native rerun required):** The four-profile 1.6 loaded-Def Pickle scenario additionally records original crop base harvestYield, harvested ThingDef, loaded item Nutrition, minimum soil fertility and sowing skill under marker `AMJ_CROP_LOADED_RESOURCE`. The scenario checks presence of the harvested item, positive harvestYield and nonnegative finite Nutrition; also includes original unchanged MO cabbage and pumpkin as comparators, distinct from the seven changed MO crops. Those inputs are not actual Pawn-modified counts, processing yields, worker time, edible output or seasonal/annual production. No changes to the 13 approved crop values, no claims of real 1.6 PASS until the new source runs.
-- Confirm 1.7 actual upstream Defs and loadFolders semantics independently before claiming 1.7 support. Do not inherit old Grains game-test successes as new-Mod acceptance.
-- Author-only distribution and private play until normal release gates are met.
-
-References: Grains prior-art/source history in GitHub `Ancient-Medieval-Japan-Grains` PR #99 and `Docs/Research/CropGrowthNormalization-20261014.md` at commit `99c4771589a671ba337af7febcc5f1849957926b`.
+**注意:** MO・MO+CCTOの原本プロバイダーに既知のFMOD音声エラーが各2件あり、既存の厳格Unity ERROR0ワークフロー判定は**2/4、全体FAILのまま**。これはCrop Growth BalanceのXML機能テスト成功と区別し、4/4 ERROR0や包括的ゲーム環境PASSと主張しない。音声不具合は別系統で管理する。1.7対応、セーブ継続性、最終配布ペイロード、公開実行は未確認。詳細な15作物の収量・栄養・Pawn作業・1日tick検証は [既存の参考監査](Balance/PreliminaryHarvestProductivity-20261014.md) に保存し、**完成条件として使用しない**。
