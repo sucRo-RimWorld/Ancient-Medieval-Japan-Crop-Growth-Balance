@@ -1,0 +1,6 @@
+# Source-only files are not part of the RimWorld subscriber payload.
+Docs/
+Tests/
+.github/
+AGENTS.md
+README.md
