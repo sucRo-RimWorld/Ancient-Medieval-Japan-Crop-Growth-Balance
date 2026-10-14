@@ -192,8 +192,119 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 });
             }
 
+
+            // Actual job-offer check on unmodified Vanilla terrain Defs.
+            // No 50%-fertility terrain is injected into Vanilla; 50% actual
+            // sow/harvest remains untested, and loaded threshold is logged.
+            private void ProbeNativeTerrainSowing()
+            {
+                string[] names = { "Gravel", "Soil", "SoilRich" };
+                float[] expected = { .7f, 1f, 1.4f };
+                ctx.Require(crop.plant.fertilityMin > .5f,
+                    "Loaded crop 50% fertility eligibility changed; check actual sow");
+                for (int i = 0; i < names.Length; i++)
+                {
+                    TerrainDef terrain = DefDatabase<TerrainDef>.GetNamedSilentFail(names[i]);
+                    ctx.Require(terrain != null, "Required Vanilla terrain missing " + names[i]);
+                    map.terrainGrid.SetTerrain(cell, terrain);
+                    float actual = map.fertilityGrid.FertilityAt(cell);
+                    ctx.Require(Math.Abs(actual - expected[i]) < .01f,
+                        "Real terrain fertility is not expected " + names[i] + ": " + actual);
+                    WorkGiver_GrowerSow giver = new WorkGiver_GrowerSow();
+                    foreach (IntVec3 unused in giver.PotentialWorkCellsGlobal(worker)) { }
+                    Job offered = giver.JobOnCell(worker, cell, true);
+                    ctx.Require(offered != null && offered.def == JobDefOf.Sow &&
+                        offered.plantDefToSow == crop,
+                        "Native sow Job not offered on " + names[i]);
+                    Log.Message("AMJ_CROP_SOIL_SOW probe=real_WorkGiver crop=" + crop.defName +
+                        " profile=" + profile + " terrain=" + names[i] +
+                        " fertility=" + actual.ToString("F2") +
+                        " offered=true executed=false");
+                }
+                map.terrainGrid.SetTerrain(cell, TerrainDefOf.Soil);
+                ctx.Require(Math.Abs(map.fertilityGrid.FertilityAt(cell) - 1f) < .01f,
+                    "Original 100%-fertility test soil did not restore");
+                Log.Message("AMJ_CROP_SOIL50 crop=" + crop.defName +
+                    " loadedFertilityMin=" + crop.plant.fertilityMin.ToString("F2") +
+                    " native50Job=NOT_RUN no_fabricated_terrain=true");
+            }
+
+            private int CountItem(string name)
+            {
+                int ground = map.listerThings.AllThings.Where(t => t.def.defName == name)
+                    .Sum(t => t.stackCount);
+                Thing carried = worker.carryTracker.CarriedThing;
+                return ground + (carried != null && carried.def.defName == name ?
+                    carried.stackCount : 0);
+            }
+
+            // Isolated mature MO tomato placed on real map then harvested with
+            // actual pawn JobDriver. Placement bypasses MO trellis/research sow
+            // conditions intentionally; it cannot establish routine farming.
+            private async Task ProbeControlledTomatoHarvest()
+            {
+                Plant testPlant = null;
+                Job job = null;
+                string harvestedDef = "";
+                int before = 0;
+                await RuntimeThread.Run(() =>
+                {
+                    ThingDef t = DefDatabase<ThingDef>.GetNamedSilentFail("DankPyon_Plant_Tomatoes");
+                    ThingDef pumpkin = DefDatabase<ThingDef>.GetNamedSilentFail("DankPyon_Plant_Pumpkins");
+                    ctx.Require(t != null && t.plant != null &&
+                        t.plant.harvestedThingDef != null &&
+                        Math.Abs(t.plant.harvestAfterGrowth - .3f) < .0001f &&
+                        Math.Abs(t.plant.growDays - 7f) < .0001f,
+                        "Native MO tomato growth/harvest input differs from source");
+                    ctx.Require(t.plant.sowTags != null &&
+                        t.plant.sowTags.Contains("DankPyon_VinePost") &&
+                        t.plant.sowResearchPrerequisites != null &&
+                        t.plant.sowResearchPrerequisites.Any(
+                            r => r.defName == "DankPyon_IntermediateAgriculture") &&
+                        DefDatabase<ThingDef>.GetNamedSilentFail("DankPyon_Post") != null,
+                        "Native MO tomato trellis/research constraints missing");
+                    ctx.Require(pumpkin != null && pumpkin.plant != null &&
+                        Math.Abs(pumpkin.plant.harvestYield - 20f) < .001f &&
+                        pumpkin.plant.sowResearchPrerequisites != null &&
+                        pumpkin.plant.sowResearchPrerequisites.Any(
+                            r => r.defName == "DankPyon_AdvancedAgriculture"),
+                        "Native MO pumpkin yield/research constraints differ");
+                    harvestedDef = t.plant.harvestedThingDef.defName;
+                    testPlant = ThingMaker.MakeThing(t) as Plant;
+                    ctx.Require(testPlant != null, "Original MO tomato not spawnable");
+                    testPlant.Growth = 1f;
+                    GenSpawn.Spawn(testPlant, cell, map);
+                    planted = testPlant; // disposal tracking, never production source
+                    ctx.Require(testPlant.Spawned && testPlant.Growth >= .999f,
+                        "Controlled mature MO tomato placement failed");
+                    before = CountItem(harvestedDef);
+                    map.designationManager.AddDesignation(
+                        new Designation(testPlant, DesignationDefOf.HarvestPlant));
+                    job = new WorkGiver_PlantsCut().JobOnThing(worker, testPlant, true);
+                    ctx.Require(job != null && job.def == JobDefOf.HarvestDesignated,
+                        "Native pawn harvest unavailable on controlled mature tomato");
+                    OfferAndStart(job, "tomato-controlled-harvest");
+                });
+                await TickJob(job, () => CountItem(harvestedDef) > before,
+                    "tomato-controlled-harvest");
+                await RuntimeThread.Run(() =>
+                {
+                    int count = CountItem(harvestedDef) - before;
+                    ctx.Require(count > 0, "Native tomato harvest produced no food");
+                    Log.Message("AMJ_CROP_TOMATO_HARVEST profile=" + profile +
+                        " output=" + harvestedDef + " count=" + count +
+                        " destroyed=" + testPlant.Destroyed +
+                        " spawned=" + testPlant.Spawned +
+                        " growthAfter=" + testPlant.Growth.ToString("F4") +
+                        " sourceHarvestAfterGrowth=0.30" +
+                        " realHarvestJob=true realSowJob=false realTrellis=false" +
+                        " repeatedHarvest=NOT_RUN");
+                });
+            }
+
             public async Task Execute()
             {
+                await RuntimeThread.Run(ProbeNativeTerrainSowing);
                 Job sow = null;
                 await RuntimeThread.Run(() =>
                 {
@@ -286,6 +397,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         " harvested=" + output + " baseYield=" + expected +
                         " actualPawnJob=true simulatedGrowthOnly=true");
                 });
+                if (withMO) await ProbeControlledTomatoHarvest();
             }
 
             public void Dispose()

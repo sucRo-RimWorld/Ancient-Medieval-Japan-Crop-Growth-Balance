@@ -19,15 +19,17 @@ class CropBalanceAuditTests(unittest.TestCase):
         self.assertEqual(rows['DankPyon_Plant_Sugarcane']['idealFullHarvestsIn20Days'], 0)
         self.assertEqual(rows['Plant_Potato']['idealFullHarvestsIn20Days'], 1)
 
-    def test_regrowth_counts_are_not_one_shot(self):
-        self.assertEqual(harvest_events(7, 13, 20, .3), 1)
-        self.assertEqual(harvest_events(7, 13, 30, .3), 2)
-        self.assertEqual(harvest_events(7, 13, 30, 0), 2)  # separately resown
-        self.assertEqual(harvest_events(7, 13, 40, .3), 3)
-        self.assertEqual(harvest_events(7, 13, 40, 0), 3)
-        # Regrowth advantage becomes visible near cycle boundaries.
-        self.assertEqual(harvest_events(7, 13, 23, .3), 2)
-        self.assertEqual(harvest_events(7, 13, 23, 0), 1)
+    def test_no_unverified_regrowth_acceleration(self):
+        self.assertEqual(harvest_events(7, 13, 20), 1)
+        self.assertEqual(harvest_events(7, 13, 23), 1)
+        self.assertEqual(harvest_events(7, 13, 30), 2)
+        with self.assertRaises(TypeError):
+            harvest_events(7, 13, 23, .3)
+        tomato = next(r for r in audit()['cropRows']
+                      if r['defName'] == 'DankPyon_Plant_Tomatoes')
+        self.assertEqual(tomato['harvestAfterGrowth'], .3)
+        self.assertFalse(tomato['postHarvestPersistenceNativeVerified'])
+        self.assertEqual(tomato['idealFullHarvestsIn20Days'], 1)
 
     def test_fertility_factors_are_not_sowability(self):
         rows = {r['defName']: r for r in audit()['cropRows']}
@@ -36,7 +38,7 @@ class CropBalanceAuditTests(unittest.TestCase):
         self.assertIn('Never infer', audit()['fertility50Sowing'])
 
     def test_strict_input_bounds(self):
-        for args in ((0, 13, 20, 0), (6, 0, 20, 0), (6, 13, -1, 0), (6, 13, 20, 1)):
+        for args in ((0, 13, 20), (6, 0, 20), (6, 13, -1)):
             with self.assertRaises(ValueError):
                 harvest_events(*args)
 
