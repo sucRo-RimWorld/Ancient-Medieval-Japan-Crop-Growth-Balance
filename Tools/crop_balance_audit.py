@@ -75,24 +75,17 @@ def verify_mo_source(archive: Path) -> None:
 
 
 def harvest_events(grow_days: float, growth_hours: float,
-                   window_days: float, harvest_after_growth: float = 0.) -> int:
-    """Instant sow; full maturity only; no job time, loss or seasons.
+                   window_days: float) -> int:
+    """Hypothetical full-maturity cycles, with instantaneous re-sowing.
 
-    harvest_after_growth is the fraction retained after harvesting; when >0,
-    repeat event intervals are shortened. This is a model assumption requiring
-    a loaded native tomato harvest/regrowth test.
+    harvestAfterGrowth in XML is not proof of after-harvest retained growth.
+    No tomato-specific repeat interval is inferred without a native harvest.
+    No season, sow/harvest job time, research or trellis constraints are included.
     """
     if grow_days <= 0 or not (0 < growth_hours <= 24) or window_days < 0:
         raise ValueError("Invalid growth model inputs")
-    if not (0 <= harvest_after_growth < 1):
-        raise ValueError("Invalid harvest-after-growth fraction")
     first = grow_days * 24 / growth_hours
-    if window_days + 1e-9 < first:
-        return 0
-    if harvest_after_growth == 0:
-        return int((window_days + 1e-9) // first)
-    repeat = first * (1 - harvest_after_growth)
-    return 1 + int((window_days - first + 1e-9) // repeat)
+    return int((window_days + 1e-9) // first)
 
 
 def audit(hours: float = 13., mo_zip: Path | None = None) -> dict:
@@ -116,17 +109,19 @@ def audit(hours: float = 13., mo_zip: Path | None = None) -> dict:
                          "baseHarvestYield": yield_count,
                          "fertilitySensitivity": sensitivity,
                          "harvestAfterGrowth": after,
+                         "postHarvestPersistenceNativeVerified": False,
                          "rawItemsPerGrowthDay": round(yield_count / effective, 4),
                          "firstHarvestIdealCalendarDays": round(first_days, 4),
-                         "idealFullHarvestsIn10Days": harvest_events(effective, hours, 10, after),
-                         "idealFullHarvestsIn20Days": harvest_events(effective, hours, 20, after),
+                         "idealFullHarvestsIn10Days": harvest_events(effective, hours, 10),
+                         "idealFullHarvestsIn20Days": harvest_events(effective, hours, 20),
                          "fertilityFactors": {str(f): round(1 + sensitivity * (f - 1), 4)
                                              for f in (.5, .7, 1., 1.4)},
                          "loadedNutritionVerified": False})
     return {"scope": "1.6 XML + offline idealized growth model, not native runtime or edible yield",
             "modeledGrowthHoursPerCalendarDay": hours,
             "moOriginalArchiveVerified": mo_zip is not None,
-            "fertility50Sowing": "Never infer crop eligibility from growth-rate factor; parent PlantBase generally needs >=0.7 (verify native MO)",
+            "fertility50Sowing": "Fertility growth factor does not prove native sow eligibility; check PlantDef and WorkGiver.",
+            "repeatHarvestModel": "Instant re-sowing full-maturity model; retained tomato growth UNVERIFIED.",
             "cropRows": rows,
             "grainsReference": {name: {"growDays": a, "baseYield": b, "minimumFertility": c}
                                 for name, (a, b, c) in GRAINS.items()}}
