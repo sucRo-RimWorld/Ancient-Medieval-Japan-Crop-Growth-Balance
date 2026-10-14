@@ -35,7 +35,7 @@ class CropBalanceAuditTests(unittest.TestCase):
         rows = {r['defName']: r for r in audit()['cropRows']}
         self.assertEqual(rows['Plant_Potato']['fertilityFactors']['0.5'], .8)
         self.assertEqual(rows['DankPyon_Plant_Lentils']['fertilityFactors']['0.5'], .65)
-        self.assertIn('Never infer', audit()['fertility50Sowing'])
+        self.assertIn('does not prove native sow eligibility', audit()['fertility50Sowing'])
 
     def test_strict_input_bounds(self):
         for args in ((0, 13, 20), (6, 0, 20), (6, 13, -1)):
