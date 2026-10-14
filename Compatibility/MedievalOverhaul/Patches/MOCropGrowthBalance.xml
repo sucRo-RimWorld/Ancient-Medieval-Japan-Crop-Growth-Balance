@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
-  <!-- Optional Medieval Overhaul: modify growDays only; preserve upstream crop identity and other fields. -->
+  <!-- Optional Medieval Overhaul; unique relative file path to avoid LoadFolders root shadowing: modify growDays only; preserve upstream crop identity and other fields. -->
   <Operation Class="PatchOperationReplace">
     <xpath>/Defs/ThingDef[defName="DankPyon_Plant_Onions"]/plant/growDays</xpath>
     <value><growDays>8</growDays></value>

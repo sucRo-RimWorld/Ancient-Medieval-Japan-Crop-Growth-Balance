@@ -37,7 +37,19 @@ class CropGrowthBalanceTests(unittest.TestCase):
         validate_patch('Patches/CropGrowthBalance.xml', BASE)
 
     def test_optional_mo_values(self):
-        validate_patch('Compatibility/MedievalOverhaul/Patches/CropGrowthBalance.xml', MO)
+        validate_patch('Compatibility/MedievalOverhaul/Patches/MOCropGrowthBalance.xml', MO)
+
+    def test_no_conditional_loadfolder_shadow(self):
+        # RimWorld's loadFolders overlay replaces root XML with the same
+        # relative path; the 2026-10-14 real MO run lost all six Base patches.
+        base_root = ROOT / "Patches"
+        mo_root = ROOT / "Compatibility/MedievalOverhaul/Patches"
+        base_paths = {f.relative_to(base_root) for f in base_root.rglob("*.xml")}
+        mo_paths = {f.relative_to(mo_root) for f in mo_root.rglob("*.xml")}
+        self.assertFalse(base_paths & mo_paths,
+                         "Conditional MO folder shadows shared patch XML")
+        self.assertIn(Path("CropGrowthBalance.xml"), base_paths)
+        self.assertIn(Path("MOCropGrowthBalance.xml"), mo_paths)
 
     def test_conditional_loader_and_unique_packageid(self):
         loader = ET.parse(ROOT / 'loadFolders.xml').getroot()
