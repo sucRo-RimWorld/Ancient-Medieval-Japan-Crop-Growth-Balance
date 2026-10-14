@@ -1,4 +1,4 @@
-# Ancient-Medieval-Japan---Crop-Growth-Balance
+# Ancient-Medieval-Japan-Crop-Growth-Balance
 バニラ、MOの作物の生育期間・収穫量をAMJ作物のバランスに合わせる
 
 Standalone **RimWorld 1.6 development** Mod (XML-only). Rebalances the growth times of 6 original RimWorld crops plus 7 **optional** Medieval Overhaul crops, including lentils (`growDays 3 -> 8`). Grains is not required. CCTO is not required; cold death is outside this Mod's scope.
