@@ -373,6 +373,115 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 });
             }
 
+
+            // Real original terrain fertility harvests. Plant, outdoor growth
+            // method and jobs are native; ONLY the 30-day calendar/sky clock
+            // for Plant.TickLong is accelerated. No game-wide season advances.
+            private async Task ProbeRealTerrainHarvest(string terrainName, float expectedFertility)
+            {
+                int initial = 0;
+                Job sow = null;
+                await RuntimeThread.Run(() =>
+                {
+                    ctx.Require(planted == null || planted.Destroyed,
+                        "Previous plant must be harvested before field is reused");
+                    TerrainDef terrain = DefDatabase<TerrainDef>.GetNamedSilentFail(terrainName);
+                    ctx.Require(terrain != null, "Required real soil terrain missing: " + terrainName);
+                    map.terrainGrid.SetTerrain(cell, terrain);
+                    float fertility = map.fertilityGrid.FertilityAt(cell);
+                    ctx.Require(Math.Abs(fertility - expectedFertility) < .01f,
+                        "Real harvested field fertility mismatch " + terrainName + ": " + fertility);
+                    ctx.Require(PlantUtility.GrowthSeasonNow(cell, map, crop) &&
+                        PlantUtility.CanSowOnGrower(crop, zone),
+                        "Native ground grower disallows crop on " + terrainName);
+                    WorkGiver_GrowerSow giver = new WorkGiver_GrowerSow();
+                    foreach (IntVec3 unused in giver.PotentialWorkCellsGlobal(worker)) { }
+                    sow = giver.JobOnCell(worker, cell, true);
+                    ctx.Require(sow != null && sow.def == JobDefOf.Sow &&
+                        sow.plantDefToSow == crop, "Real sow Job unavailable: " + terrainName);
+                    OfferAndStart(sow, "soil-" + terrainName + "-sow");
+                });
+                await TickJob(sow, () => cell.GetPlant(map) != null &&
+                    cell.GetPlant(map).def == crop &&
+                    cell.GetPlant(map).LifeStage != PlantLifeStage.Sowing,
+                    "soil-" + terrainName + "-sow");
+                await RuntimeThread.Run(() =>
+                {
+                    planted = cell.GetPlant(map);
+                    ctx.Require(planted != null && planted.Spawned && planted.sown &&
+                        planted.Growth < 1f, "Real job did not plant a growing crop: " + terrainName);
+                    initial = Find.TickManager.TicksGame;
+                });
+                float growth10 = 0f, growth20 = 0f, growth30 = 0f;
+                int maturityStep = -1;
+                for (int k = 1; k <= 900; k += 30)
+                {
+                    int start = k;
+                    await RuntimeThread.Run(() =>
+                    {
+                        ctx.Require(deadline.Elapsed.TotalSeconds < 230,
+                            "Real soil native TickLong deadline: " + terrainName);
+                        for (int j = start; j < Math.Min(start + 30, 901); j++)
+                        {
+                            Find.TickManager.DebugSetTicksGame(initial + j * 2000);
+                            map.skyManager.ForceSetCurSkyGlow(GenCelestial.CurCelestialSunGlow(map));
+                            ctx.Require(planted.Spawned && !planted.Destroyed,
+                                "Native field plant died during controlled growth: " + terrainName);
+                            planted.TickLong();
+                            if (maturityStep < 0 && planted.Growth >= .999f) maturityStep = j;
+                            if (j == 300) growth10 = planted.Growth;
+                            if (j == 600) growth20 = planted.Growth;
+                            if (j == 900) growth30 = planted.Growth;
+                        }
+                    });
+                    await Task.Delay(1);
+                }
+                int before = 0;
+                Job harvest = null;
+                await RuntimeThread.Run(() =>
+                {
+                    ctx.Require(growth10 > 0f && growth10 <= growth20 &&
+                        growth20 <= growth30 && growth30 >= .999f &&
+                        maturityStep >= 0,
+                        "Real soil harvest crop did not mature by controlled day30: " +
+                        terrainName + " growth30=" + growth30);
+                    before = CountHarvest();
+                    map.designationManager.AddDesignation(
+                        new Designation(planted, DesignationDefOf.HarvestPlant));
+                    harvest = new WorkGiver_PlantsCut().JobOnThing(worker, planted, true);
+                    ctx.Require(harvest != null && harvest.def == JobDefOf.HarvestDesignated,
+                        "Native pawn cannot harvest mature original crop: " + terrainName);
+                    OfferAndStart(harvest, "soil-" + terrainName + "-harvest");
+                });
+                await TickJob(harvest, () => planted.Destroyed && CountHarvest() > before,
+                    "soil-" + terrainName + "-harvest");
+                await RuntimeThread.Run(() =>
+                {
+                    int observed = CountHarvest() - before;
+                    float expected = crop.plant.harvestYield;
+                    ctx.Require(observed > 0, "Actual field produced zero yield: " + terrainName);
+                    ctx.Assert(observed >= Math.Floor(expected) &&
+                        observed <= Math.Ceiling(expected * 2),
+                        "Actual field harvest inconsistent with original Def: " + terrainName +
+                        " observed=" + observed + " baseYield=" + expected);
+                    Log.Message("AMJ_CROP_SOIL_REAL_HARVEST profile=" + profile +
+                        " crop=" + crop.defName + " terrain=" + terrainName +
+                        " fertility=" + expectedFertility.ToString("F2") +
+                        " growth10=" + growth10.ToString("F4") +
+                        " growth20=" + growth20.ToString("F4") +
+                        " growth30=" + growth30.ToString("F4") +
+                        " firstFullMaturityStep=" + maturityStep +
+                        " harvested=" + observed + " baseYield=" + expected +
+                        " workerHarvestStat=" +
+                        worker.GetStatValue(StatDefOf.PlantHarvestYield).ToString("F4") +
+                        " realPawnSow=true realPawnHarvest=true" +
+                        " worldSeasonTicked=false");
+                    map.terrainGrid.SetTerrain(cell, TerrainDefOf.Soil);
+                    ctx.Require(Math.Abs(map.fertilityGrid.FertilityAt(cell) - 1f) < .01f,
+                        "Normal Soil was not restored between real field tests");
+                });
+            }
+
             public async Task Execute()
             {
                 await RuntimeThread.Run(ProbeNativeTerrainSowing);
@@ -470,6 +579,10 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         worker.GetStatValue(StatDefOf.PlantHarvestYield).ToString("F4") +
                         " actualPawnJob=true simulatedGrowthOnly=true");
                 });
+                // Same original crop, three genuinely sown/harvested soil levels;
+                // existing 100% Soil native cycle above is the middle benchmark.
+                await ProbeRealTerrainHarvest("Gravel", .7f);
+                await ProbeRealTerrainHarvest("SoilRich", 1.4f);
                 if (withMO) await ProbeControlledTomatoHarvest();
             }
 
