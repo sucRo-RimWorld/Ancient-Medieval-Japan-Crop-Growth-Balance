@@ -41,6 +41,8 @@ Game `growDays` is **not calendar days**: temperature, soil fertility and outdoo
 
 **収穫数・生育期間の数値再評価（確定仕様の変更なし）：** [PreliminaryHarvestProductivity-20261014.md](Balance/PreliminaryHarvestProductivity-20261014.md) の第二次監査では、Vanilla 6・MO 7・MO未調整対照2の基準収穫数と生育日数、Grains七穀の加工差を比較した。13時間/日の理想日照モデルでは20暦日中のトウモロコシ13日・MOサトウキビ12日は満熟不可。MOレンズ豆10個/8日（1.250個/成長日）に対してMOカボチャ20個/8日（2.500個/成長日）だが、これのみで作物性能は確定しない。MOトマトの`harvestAfterGrowth=0.30`はMO/MO+CCTO両構成で**収穫後に株が生存しGrowth=0.3000**となることを実証した。Project [run #38565073363](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38565073363)（owner `5bb15ade9e6aae0c8e412047374ad9a1d0ad2f1a`）では同じ株を制御暦で成長させ、2回目の実Pawn収穫（MO10個／MO+CCTO11個）後もGrowth=0.3000を確認。**支柱への実播種・最短再収穫周期・全マップの季節/仕事量は未検証**なので、再成長率1.633を年間経済バランスの確定値としては採用しない。専用支柱`DankPyon_Post`＋中級農業研究が播種前提で、カボチャにも上級農業研究が必要。肥沃度50%の成長係数は播種可否の保証ではなく、Vanilla主要作物の最低肥沃度70%との区別が必要。**現行13件の`growDays`と全`harvestYield`は維持**し、採用前に実ゲーム収穫・加工後の栄養と労働、Grains共存、VE/非VEを検証する。
 
+**Grains同時ロードでの所有境界テスト（実行未済）：** Source-owned `Tests/E2E/CropGrowthGrainsSteps.cs` と `crop-growth-grains-16.feature` は、実ロードのCGB作物6＋任意MO7、Grainsの独立5穀＋Vanilla `Plant_Rice=5`＋MO/非MO小麦=12を、Vanilla/CCTO/MO/MO+CCTOの四つの**Grains同時有効**構成で検査するための開発専用テスト。Grains実本番XMLはGrains mainの不変コミットから隔離ランナーへステージングし、CGB本番XMLと同時ロードする。GrainsをCGBの必須依存へ変更しない。**C#ソース追加だけでは実ゲームでの競合不在を証明しない**ため、Projectホスト実行とPickle・全Unity ERROR判定を別途要する。料理・加工・季節/生育労働はこのロード済みDefテスト外。
+
 ## Acceptance
 
 - Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.
