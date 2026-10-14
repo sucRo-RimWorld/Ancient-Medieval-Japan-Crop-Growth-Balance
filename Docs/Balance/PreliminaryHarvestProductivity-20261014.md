@@ -1,5 +1,9 @@
 # Vanilla/MO crop gross-yield baseline — 2026-10-14
 
+## 2026-10-14 実ゲーム1暦日の全系統tick検証（ジャガイモ、固定25℃）
+
+[Project #38588357603](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38588357603)（artifact **11907525113**、owner `5062f4995c83a69e9d8a55e5d4991ecc6da69c60`）にて、Vanilla実Pawn播種（75tick）の原本ジャガイモを、手動の`Plant.TickLong`を使わずゲーム全体の`TickManager.DoSingleTick` **60,000回＝1暦日** で進めた。成長率は **0.0001→0.0638**、株は生存。温度を25℃に固定しているため実季節の温度変化は測らない。1日だけで収穫は行わず、この数値を10/20/30日の実収穫・年間可食Nutrition・作業時間へ外挿しない。全4元構成の既存Pickleは各1/1 PASS、MO系Unity FMOD ERROR2ずつで厳格2/4、総合FAIL。独立した10～30日全マップ反復栽培と加工食料・実労働の受け入れ試験は引き続きOPEN。本番パッチは変更しない。
+
 ## 2026-10-14 Pawn作業tick実測（限定的な1株、15作物全体ではない）
 
 [Project Actions #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173)（artifact **11905262794**、Crop source `83c0d2fc34b32760fadae84f8dcdebe9fcb0e51f`）で実際の`TickManager.DoSingleTick`を使い、1.6の元のジャガイモ／MOレンズ豆の実播種・収穫Job実行tickを取得。元の3種類の土壌で両作物ともPickle PASS（全4構成）、ただしMO系は既知FMOD ERROR各2で厳格2/4・ワークフローFAIL。

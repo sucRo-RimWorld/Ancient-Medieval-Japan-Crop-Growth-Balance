@@ -45,6 +45,8 @@ Game `growDays` is **not calendar days**: temperature, soil fertility and outdoo
 
 **実Pawn JobDriverの作業tick検証（2026-10-14）：** [Project 1.6 #38585842173](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38585842173)、artifact **11905262794** では、Vanilla Potato/MO LentilsのSoil/Gravel/SoilRich元地形と、MO Tomatoの同一株2回収穫について真の`TickManager.DoSingleTick`消費tickを測定。全4構成Pickle各1/1 PASSだが厳格ERROR0は2/4（MO各FMOD2、総合FAIL）。**初回Soil播種は移動距離が長く、以降は作物近くから開始するため、肥沃度間のJob時間比較は未成立。** 収量・全15作物の実作業、季節を通した生産性、加工栄養は確定しない。数値は [数値監査](Balance/PreliminaryHarvestProductivity-20261014.md)、正確な実ゲーム証拠は [Native16 CropGrowth](Testing/Native16-CropGrowth-20261014.md) を参照。
 
+**実世界tickの能力実証（2026-10-14）：** [Project実ゲーム #38588357603](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38588357603)、artifact **11907525113**。Vanillaジャガイモ1株を実Pawnが播種後、`TickManager.DoSingleTick`で世界・マップ・Pawnを60,000tick＝1暦日動かし、成長率**0.0001→0.0638**を確認。元の制御植物のみ`TickLong`と異なる。ただし外気温25℃固定、**収穫なし**、MO/CCTO側には本追加1日を実施していない。全四構成の既存Field Pickleは各1/1 PASS、厳格Unity ERROR0は2/4のみ（MO FMOD2ずつ）。10/20/30日自然気候・複数作期・食料/作業量経済はOPEN、数値変更を認める根拠にはならない。
+
 ## Acceptance
 
 - Static: exact 6 Vanilla and 7 MO `growDays` replacements, one per matched 1.6 crop Def, no other fields touched; MO-only files guarded; unique packageId; 1.6-only support claim; XML parse succeeds.
