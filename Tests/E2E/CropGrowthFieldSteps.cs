@@ -135,10 +135,18 @@ namespace AMJ.CropGrowthBalance.NativeTests
                     Pawn candidate = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
                     if (!candidate.Downed && candidate.skills != null &&
                         !candidate.WorkTypeIsDisabled(WorkTypeDefOf.Growing))
-                    { actor = candidate; break; }
+                    {
+                        // Filter randomly generated pawn-specific harvest-stat penalties
+                        // BEFORE selecting an otherwise valid real worker. Do not
+                        // silently change harvest stat defs or expected crop yields.
+                        candidate.skills.GetSkill(SkillDefOf.Plants).Level = 20;
+                        if (candidate.GetStatValue(StatDefOf.PlantHarvestYield) >= 1f)
+                        { actor = candidate; break; }
+                    }
                     candidate.Destroy(DestroyMode.Vanish);
                 }
-                ctx.Require(actor != null, "No grower pawn could be generated");
+                ctx.Require(actor != null,
+                    "No eligible actual worker with Plants20 and harvest yield >=1");
                 worker = actor;
                 items.Add(worker);
                 GenSpawn.Spawn(worker, map.Center, map);
@@ -395,6 +403,8 @@ namespace AMJ.CropGrowthBalance.NativeTests
                     Log.Message("AMJ_CROP_FIELD_HARVEST crop=" + crop.defName +
                         " profile=" + profile + " item=" + outputName +
                         " harvested=" + output + " baseYield=" + expected +
+                        " workerHarvestStat=" +
+                        worker.GetStatValue(StatDefOf.PlantHarvestYield).ToString("F4") +
                         " actualPawnJob=true simulatedGrowthOnly=true");
                 });
                 if (withMO) await ProbeControlledTomatoHarvest();
