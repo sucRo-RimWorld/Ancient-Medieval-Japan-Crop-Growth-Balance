@@ -69,6 +69,8 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertIn("AMJ_CROP_SOIL_SOW", step)
         self.assertIn("ProbeControlledTomatoHarvest", step)
         self.assertIn("AMJ_CROP_TOMATO_HARVEST", step)
+        self.assertIn("candidate.GetStatValue(StatDefOf.PlantHarvestYield) >= 1f", step)
+        self.assertIn("workerHarvestStat=", step)
         self.assertIn("repeatedHarvest=NOT_RUN", step)
         self.assertIn("realTrellis=false", step)
         self.assertIn("class CropGrowthFieldQuickstart : AbstractQuickstart", quick)
