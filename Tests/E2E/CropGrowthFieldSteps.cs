@@ -535,6 +535,81 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 });
             }
 
+            // One real 60,000-tick 1.6 map/world/Pawn day for the original
+            // Vanilla potato. Unlike controlled TickLong growth samples, the
+            // ordinary TickManager.DoSingleTick advances the entire game.
+            // Temperature remains held at 25C and this is NOT a natural season
+            // or a whole-season harvest/economy acceptance.
+            private async Task ProbeFullWorldDay()
+            {
+                Job sow = null;
+                await RuntimeThread.Run(() =>
+                {
+                    ctx.Require(profile == "vanilla" && matchedGrowthCalendar >= 0,
+                        "One-day full-world pilot runs only on the original Vanilla profile");
+                    ctx.Require(planted == null || planted.Destroyed,
+                        "Prior native soil crop must have been harvested");
+                    map.terrainGrid.SetTerrain(cell, TerrainDefOf.Soil);
+                    Find.TickManager.DebugSetTicksGame(matchedGrowthCalendar);
+                    map.skyManager.ForceSetCurSkyGlow(GenCelestial.CurCelestialSunGlow(map));
+                    ctx.Require(PlantUtility.CanSowOnGrower(crop, zone) &&
+                        PlantUtility.GrowthSeasonNow(cell, map, crop),
+                        "Original potato must be sowable at 25C before real day");
+                    WorkGiver_GrowerSow giver = new WorkGiver_GrowerSow();
+                    foreach (IntVec3 unused in giver.PotentialWorkCellsGlobal(worker)) { }
+                    sow = giver.JobOnCell(worker, cell, true);
+                    ctx.Require(sow != null && sow.def == JobDefOf.Sow &&
+                        sow.plantDefToSow == crop, "Real world-day pawn sow not offered");
+                    OfferAndStart(sow, "full-world-day-sow");
+                });
+                int sowTicks = await TickJob(sow, () => cell.GetPlant(map) != null &&
+                    cell.GetPlant(map).def == crop &&
+                    cell.GetPlant(map).LifeStage != PlantLifeStage.Sowing,
+                    "full-world-day-sow");
+                int startTick = -1;
+                float startGrowth = -1f;
+                await RuntimeThread.Run(() =>
+                {
+                    planted = cell.GetPlant(map);
+                    ctx.Require(planted != null && planted.Spawned && planted.sown,
+                        "A real Pawn must sow before full-world day");
+                    startGrowth = planted.Growth;
+                    startTick = Find.TickManager.TicksGame;
+                });
+                const int dayTicks = 60000;
+                const int batch = 300;
+                for (int i = 0; i < dayTicks; i += batch)
+                {
+                    await RuntimeThread.Run(() =>
+                    {
+                        ctx.Require(deadline.Elapsed.TotalSeconds < 230,
+                            "Full-world day exceeded fixture wall-clock deadline");
+                        for (int j = 0; j < batch; j++)
+                            Find.TickManager.DoSingleTick();
+                    });
+                    await Task.Delay(1);
+                }
+                await RuntimeThread.Run(() =>
+                {
+                    int elapsed = Find.TickManager.TicksGame - startTick;
+                    ctx.Require(elapsed == dayTicks,
+                        "Expected exactly one full-world game day of native ticks");
+                    ctx.Require(planted.Spawned && !planted.Destroyed &&
+                        planted.Growth > startGrowth,
+                        "Original potato failed to grow during complete world day");
+                    Log.Message("AMJ_CROP_FULL_WORLD_DAY profile=vanilla" +
+                        " crop=" + crop.defName +
+                        " worldAndPawnTicks=" + elapsed +
+                        " realPawnSowTicks=" + sowTicks +
+                        " growthBefore=" + startGrowth.ToString("F4") +
+                        " growthAfter=" + planted.Growth.ToString("F4") +
+                        " outsideTemperatureFixed25C=true" +
+                        " calledPlantTickLongManually=false" +
+                        " entireWorldTicked=true actualSeasonEconomy=false" +
+                        " horizonDays=1 noHarvestInThisProbe=true");
+                });
+            }
+
             public async Task Execute()
             {
                 await RuntimeThread.Run(ProbeNativeTerrainSowing);
@@ -660,6 +735,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 await ProbeRealTerrainHarvest("Gravel", .7f);
                 await ProbeRealTerrainHarvest("SoilRich", 1.4f);
                 if (withMO) await ProbeControlledTomatoHarvest();
+                if (profile == "vanilla") await ProbeFullWorldDay();
             }
 
             public void Dispose()
