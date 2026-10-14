@@ -139,3 +139,28 @@ The 50% and 140% figures are **native fertility growth-factor calculations**, no
 - MO strict ERROR0 remains open on the native Linux host pending independently resolved existing FMOD source issue. Do not weaken overall acceptance thresholds.
 - RimWorld **1.7** official source/actual game/Vanilla and MO loaded profile verification; not supported or tested by these 1.6 runs.
 - Steam/2game and user's normal Mods folder **not updated or published** by these GitHub test runs.
+
+## Loaded harvest resource evidence #38574555592 — 15 loaded 1.6 crops, 4/4 Pickle PASS; strict 2/4 (2026-10-14)
+
+Actual source-pinned [Project Linux run #38574555592](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Project/actions/runs/38574555592), artifact **11899008047**, owner `f470701c5b3a4bcb7366efb11132a3f2f03a2638`, Project host `ded06f6574f7767c78e972c2c1c8b920b229ecb3`; actual game log **RimWorld 1.6.4871 rev600**. All four real Pickle source-owned scenarios **1/1 PASS, exit0** with the expected Vanilla6 + optional MO7 exact `growDays`, original resource Defs, base `harvestYield`, abstract item `Nutrition`, `fertilityMin`, `sowMinSkill`; optional MO scenarios additionally audit unchanged cabbage/pumpkins (15 loaded rows). Unity ERROR counts **0/0/2/2** in Vanilla/Vanilla+CCTO/MO/MO+CCTO. MO errors are the independent existing FMOD Unsupported-format pair. Strict workflow **FAIL**, only the two non-MO profiles meet ERROR0; no exemption.
+
+| Crop (actual loaded Def) | growDays | base harvestYield | loaded raw Nutrition | sowMinSkill |
+|---|---:|---:|---:|---:|
+| Vanilla Potato | 6 | 11 | 0.05 | 0 |
+| Vanilla Corn | 13 | 22 | 0.05 | 0 |
+| Vanilla Strawberry | 6 | 8 | 0.05 | 5 |
+| Vanilla Cotton | 10 | 10 | 0.00 | 0 |
+| Vanilla Hops | 7 | 8 | 0.05 | 3 |
+| Vanilla Smokeleaf | 9 | 9 | 0.05 | 4 |
+| MO Onions | 8 | 13 | 0.05 | 3 |
+| MO Lentils | 8 | 10 | 0.05 | 8 |
+| MO Garlic | 10 | 6 | 0.05 | 3 |
+| MO Flax | 9 | 18 | 0.05 | 0 |
+| MO Sugarcane | 12 | 11 | 0.05 | 3 |
+| MO Carrots | 6 | 6 | 0.05 | 4 |
+| MO Tomatoes | 7 | 8 | **0.05, inherited** | 4 |
+| MO Cabbages (unchanged) | 8 | 10 | 0.05 | 4 |
+| MO Pumpkins (unchanged) | 8 | 20 | 0.05 | 8 |
+
+All loaded `fertilityMin` were **0.70**, with the same applicable loaded values in both CCTO states. Loaded cotton harvest item is `Cloth` in Vanilla profiles and `DankPyon_RawCotton` with MO; the other original MO items remain their original named source Defs. Original `DankPyon_RawTomatoes` does **not** explicitly define `Nutrition` in the 1.6 MO source XML, but its inherited actual loaded ThingDef stat is **0.05**. Flax/sugarcane/hops/smokeleaf likewise having a nonzero item `Nutrition` stat is **not proof of direct edibility**. `base harvestYield` is not a Pawn's actual collected output and `0.70 fertilityMin` is not a performed Pawn sow job at 50% ground. No Grains coexistence, production change, yearly season, labor, trellis sow or processed food yield was established by this run. The separate converted-audio 4/4 ERROR0 field trial uses **disposable PCM WAV copies**; this run retains **unmodified provider MP3** and therefore its original FMOD errors. Never combine their acceptance scopes.
+
