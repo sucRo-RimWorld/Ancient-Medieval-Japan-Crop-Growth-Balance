@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using RimWorks.Pickle;
+using RimWorld;
+using System.Globalization;
 using Verse;
 
 namespace AMJ.CropGrowthBalance.NativeTests
@@ -46,6 +48,9 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 Check(ctx, "DankPyon_Plant_Sugarcane", 12f);
                 Check(ctx, "DankPyon_Plant_Carrots", 6f);
                 Check(ctx, "DankPyon_Plant_Tomatoes", 7f);
+                // Original MO controls, not modified by Crop Growth Balance.
+                Check(ctx, "DankPyon_Plant_Cabbages", 8f);
+                Check(ctx, "DankPyon_Plant_Pumpkins", 8f);
             }
         }
 
@@ -59,6 +64,25 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 ctx.Assert(Math.Abs(thing.plant.growDays - expected) < 0.0001f,
                     name + " loaded growDays=" + thing.plant.growDays +
                     "; expected " + expected);
+
+                // Capture actual loaded output inputs, not processed or annual yields.
+                ThingDef harvested = thing.plant.harvestedThingDef;
+                ctx.Assert(harvested != null, name + " harvestedThingDef missing");
+                ctx.Assert(thing.plant.harvestYield > 0f,
+                    name + " base harvestYield must be positive");
+                if (harvested != null)
+                {
+                    float rawNutrition = harvested.GetStatValueAbstract(StatDefOf.Nutrition);
+                    ctx.Assert(!float.IsNaN(rawNutrition) && rawNutrition >= 0f,
+                        name + " harvested item has invalid Nutrition");
+                    Log.Message("AMJ_CROP_LOADED_RESOURCE crop=" + name +
+                        " growDays=" + thing.plant.growDays.ToString("F4", CultureInfo.InvariantCulture) +
+                        " harvestYield=" + thing.plant.harvestYield.ToString("F4", CultureInfo.InvariantCulture) +
+                        " harvestedThing=" + harvested.defName +
+                        " rawNutrition=" + rawNutrition.ToString("F4", CultureInfo.InvariantCulture) +
+                        " fertilityMin=" + thing.plant.fertilityMin.ToString("F4", CultureInfo.InvariantCulture) +
+                        " sowMinSkill=" + thing.plant.sowMinSkill);
+                }
             }
         }
     }
