@@ -68,11 +68,11 @@
 
 ---
 
-**Evidence:** real user-provided Medieval Overhaul archive `3219596926.zip`, **only** `3219596926/1.6/Defs/ThingDefs_Plants/Plants_Cultivated_Farm.xml` for crop values and `3219596926/1.6/Defs/ThingDefs_Items/Items_Resource_RawPlant.xml` for item Nutrition. Do not accidentally use the 1.4/1.5 variants of the same relative XML path. No executable game or current 1.7 MO source was inspected here. The production owner `Patches/CropGrowthBalance.xml` and `Compatibility/MedievalOverhaul/Patches/CropGrowthBalance.xml` remain unchanged.
+**Evidence:** real user-provided Medieval Overhaul archive `3219596926.zip`, **only** `3219596926/1.6/Defs/ThingDefs_Plants/Plants_Cultivated_Farm.xml` for crop values and `3219596926/1.6/Defs/ThingDefs_Items/Items_Resource_RawPlant.xml` for item Nutrition. Do not accidentally use the 1.4/1.5 variants of the same relative XML path. No executable game or current 1.7 MO source was inspected here. The original MO tomato `DankPyon_RawTomatoes` in `Items_Resource_RawPlant.xml` has only MarketValue in its `statBases`, inheriting Nutrition from `PlantFoodRawBase`; source XML does not establish its effective Nutrition. The 0.05 / 0.0571 previously shown as **explicit** was incorrect. The native loaded-resource test must resolve the effective number. The production owner `Patches/CropGrowthBalance.xml` and `Compatibility/MedievalOverhaul/Patches/CropGrowthBalance.xml` remain unchanged.
 
 ## Gross source-based index
 
-The following is **not calendar days, actual annual yield or tested native gameplay**. It is `harvestYield / effective growDays` at exactly fertility 100%, optimal growth temperature, common outdoor lighting opportunity, no sowing/harvest/movement/time loss and one planting/harvest cycle. `growDays` still needs game light, heat and fertility multipliers. "Nutrition index" is only shown when the **1.6 MO raw ThingDef explicitly defines `statBases/Nutrition=0.05`**; it is `harvestYield × 0.05 / growDays`, without digestion, meals, real Jobs or soil effects.
+The following is **not calendar days, actual annual yield or tested native gameplay**. It is `harvestYield / effective growDays` at exactly fertility 100%, optimal growth temperature, common outdoor lighting opportunity, no sowing/harvest/movement/time loss and one planting/harvest cycle. `growDays` still needs game light, heat and fertility multipliers. "Nutrition index" is only shown when the **1.6 MO raw ThingDef explicitly defines `statBases/Nutrition=0.05`** (the original tomato item inherits its Nutrition and has no explicit value); it is `harvestYield × 0.05 / growDays`, without digestion, meals, real Jobs or soil effects.
 
 | Crop | Original growDays | New growDays | Original harvestYield | Units / growDay after patch | Explicit raw Nutrition | Gross Nutrition index |
 |---|---:|---:|---:|---:|---:|---:|
@@ -80,7 +80,7 @@ The following is **not calendar days, actual annual yield or tested native gamep
 | MO lentils | 3 | 8 | 10 | 1.250 | 0.05 | 0.0625 |
 | MO garlic | 4 | 10 | 6 | 0.600 | 0.05 | 0.0300 |
 | MO carrots | 3.25 | 6 | 6 | 1.000 | 0.05 | 0.0500 |
-| MO tomatoes | 4.25 | 7 | 8 | 1.143 | 0.05 | 0.0571 |
+| MO tomatoes | 4.25 | 7 | 8 | 1.143 | inherited; not explicit in MO 1.6 | — |
 | MO flax | 7 | 9 | 18 | 2.000 | not explicitly defined | — |
 | MO sugarcane | 5.8 | 12 | 11 | 0.917 | not explicitly defined | — |
 | MO cabbage — unchanged comparison | 8 | 8 | 10 | 1.250 | 0.05 | 0.0625 |

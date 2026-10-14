@@ -90,6 +90,17 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertNotIn("CropGrowthFieldSteps", (ROOT / "loadFolders.xml").read_text())
         self.assertNotIn("CropGrowthFieldQuickstart", (ROOT / "loadFolders.xml").read_text())
 
+    def test_loaded_game_economy_probe_keeps_mo_controls_separate(self):
+        # Source-only guard: actual loaded-game execution is a separate gate.
+        step = (ROOT / "Tests/E2E/CropGrowthBalanceSteps.cs").read_text()
+        self.assertIn("AMJ_CROP_LOADED_RESOURCE", step)
+        self.assertIn("harvested.GetStatValueAbstract(StatDefOf.Nutrition)", step)
+        self.assertIn("thing.plant.harvestYield", step)
+        self.assertIn("thing.plant.fertilityMin", step)
+        self.assertIn('Check(ctx, "DankPyon_Plant_Cabbages", 8f)', step)
+        self.assertIn('Check(ctx, "DankPyon_Plant_Pumpkins", 8f)', step)
+        self.assertIn("Original MO controls, not modified", step)
+
     def test_conditional_loader_and_unique_packageid(self):
         loader = ET.parse(ROOT / 'loadFolders.xml').getroot()
         self.assertEqual(loader.tag,'loadFolders')
