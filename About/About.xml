@@ -9,7 +9,7 @@
     <li>DankPyon.Medieval.Overhaul</li>
     <li>sucro.ancientmedievaljapan.core</li>
   </loadAfter>
-  <description>Development build. Rebalances selected existing Vanilla crops and optional Medieval Overhaul crops using an agronomy-informed, game-compressed relative growth period. Preserves yields, growth temperatures, sowing conditions, research, plant IDs and products. Works without AMJ Grains; no CCTO dependency. 1.6 source/static verification only. Native game tests and public release are pending.
+  <description>Aligns the growth periods of six Vanilla crops and seven optional Medieval Overhaul crops with the relative crop timing used by AMJ Grains. Only growth days are changed; yields, temperature rules, research and harvested products are preserved. AMJ Grains, Medieval Overhaul and CCTO are optional. Real RimWorld 1.6 crop-function tests passed; separate original Medieval Overhaul audio errors remain. Public release is planned alongside AMJ Grains.
 
-開発版。既存のVanilla作物6種と、Medieval Overhaul導入時の作物7種の生育日数を、農学的な早晩差に基づくゲーム内の相対基準へ調整する。収量・温度・播種条件・研究・PlantDef識別子・収穫物は変更しない。AMJ Grains・CCTOは不要。1.6向け静的検証のみ実施。実機検証・公開判断は未完了。</description>
+AMJ Grainsの作物生育期間のバランスに合わせて、バニラ6種・任意のMedieval Overhaul作物7種の生育日数を調整する。変更対象は生育日数のみ。収穫数・温度・研究・収穫物は変更しない。AMJ Grains・Medieval Overhaul・CCTOはいずれも任意。RimWorld 1.6で作物機能の実機検証済みだが、MO原本由来の別系統の音声エラーは残る。一般公開はAMJ Grainsと同時に予定。</description>
 </ModMetaData>
