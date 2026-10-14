@@ -1,6 +1,6 @@
 # Ancient & Medieval Japan - Crop Growth Balance — 設計書
 
-**Status:** 2026-10-14, independent source implementation for **RimWorld 1.6 development build only**. Live 1.6 runtime and 1.7 source/runtime are not yet accepted. Steam/2game publication is not approved. Original values derive from Grains PR #99 and are now owned by this dedicated repository. Grains extraction is PR #101 (main `b62d8ec9ee97b50eaa1043b9d51a44e4d1d412c3`).
+**Status:** 2026-10-14, independent **RimWorld 1.6 development build only**. Four real-provider 1.6 profiles now confirm the source-owned *loaded growth-day* assertions (one Pickle scenario each, all PASS), **but strict game acceptance is only Vanilla and Vanilla+CCTO (ERROR0)**; MO and MO+CCTO both retain **2 Unity FMOD ERROR** per profile, so the overall native test workflow is FAIL. See [Native16-CropGrowth-20261014.md](Testing/Native16-CropGrowth-20261014.md) for exact source/game/run/evidence. Native sow/harvest, full-season yields, Grains coexistence and 1.7 remain unverified. Steam/2game publication is not approved. Original values derive from Grains PR #99 and are now owned by this dedicated repository. Grains extraction is PR #101 (main `b62d8ec9ee97b50eaa1043b9d51a44e4d1d412c3`).
 
 ## Scope and responsibilities
 
