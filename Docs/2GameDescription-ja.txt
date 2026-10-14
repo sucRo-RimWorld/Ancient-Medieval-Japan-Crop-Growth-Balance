@@ -1,0 +1,21 @@
+バニラとMedieval Overhaulの既存作物の生育日数を、AMJ Grainsの作物バランスに合わせるMod。
+
+▼ 特徴
+バニラ作物6種と、MO導入時の7種の生育日数を調整する。新しい作物や料理は追加しない。
+
+▼ バランス方針
+Grainsとの相対的な生育期間を整える。収穫量・栄養量・耐寒性は変更しない。
+
+▼ 対応範囲
+RimWorld 1.6。MO導入時のみMO作物にも適用する。
+
+▼ 対応・互換性
+[AMJ Grains](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Grains)との併用を意図するが必須依存ではない。CCTOも任意。両Modの公開時期は合わせる。
+
+▼ セーブ互換性
+作物の識別子は維持する。既存セーブへの追加・削除は別途未検証のためバックアップを推奨する。
+
+▼ 今後の予定
+必要に応じて対応ゲームバージョンを検証する。数値の詳細な均等化は予定しない。
+
+詳細：[GitHub](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Crop-Growth-Balance)

@@ -1,12 +1,29 @@
-# Ancient-Medieval-Japan-Crop-Growth-Balance
-バニラ、MOの作物の生育期間・収穫量をAMJ作物のバランスに合わせる
+# Ancient & Medieval Japan - Crop Growth Balance（中世日本 - 作物生育期間調整）
 
-Standalone **RimWorld 1.6 development** Mod (XML-only). Rebalances the growth times of 6 original RimWorld crops plus 7 **optional** Medieval Overhaul crops, including lentils (`growDays 3 -> 8`). Grains is not required. CCTO is not required; cold death is outside this Mod's scope.
+RimWorld 1.6用の独立したXML Mod。**AMJ Grainsが採用した生育期間のバランスに、バニラとMedieval Overhaulの既存作物を合わせる**ため、対象の `growDays` だけを変更する。現実の栽培期間は相対的な早晩差を考える参考であり、史実どおりの暦日を再現するModではない。
 
-**Current implementation:** only 13 existing crop `growDays` values are changed (Vanilla 6 / optional MO 7). Yield and nutrition are not changed yet; harvest-yield tuning requires separate native production/processing analysis and an approved specification.
+## 変更内容
 
-See `Docs/Design.md` for the complete adopted table, exceptions and testing gates. Not released on Steam/2game. Native Linux RimWorld 1.6 loaded-Def checks and isolated real-pawn sow/grow/harvest Pickle scenarios each completed 4/4 profiles successfully on pinned source; the strict full-run gate remains **2/4 PASS**, because both MO profiles emitted 2 independently reproduced FMOD Unity errors. Field sampling used controlled `Plant.TickLong` calendar advances, **not** a full-season simulation. Grains coexistence and 1.7 support are **not yet verified**. See `Docs/Testing/Native16-CropGrowth-20261014.md`.
+- バニラ6種：ジャガイモ6、トウモロコシ13、イチゴ6、綿花10、ホップ7、スモークリーフ9。
+- Medieval Overhaul（MO）導入時のみ7種：タマネギ8、レンズ豆8、ニンニク10、亜麻9、サトウキビ12、ニンジン6、トマト7。
+- 収穫数・栄養量・研究・栽培条件・耐寒性・品目・画像は変更しない。作物性能の一律均等化は目的としない。
+- AMJ Grainsが所有する七穀、バニラの稲、MOの小麦にはパッチを当てない。
 
-## Installation
+上記はゲームの `growDays` であり、実際の暦日とは異なる。具体的な旧→新の全13件は [設計書](Docs/Design.md) を参照。
 
-Extract the **playable** ZIP to the RimWorld Mods folder so the directory `Ancient-Medieval-Japan-Crop-Growth-Balance` directly contains `About`, `Patches`, `Compatibility`, and `loadFolders.xml`. Do not place the source ZIP directly in the Mods folder. Select it in the Mods list. MO is optional; with MO installed, put Crop Growth Balance after MO (also encoded as a loadAfter hint). It may be installed independently of Grains. To avoid duplicate patches, update Grains to a revision after the split PR before testing combined profiles.
+## 対応・導入
+
+- 対応ゲーム：**RimWorld 1.6のみ**。1.7対応は未確認。
+- 必須Mod：なし。**AMJ Grainsとの併用を意図した調整Mod**だが、Grains単体・本Mod単体でも動作する。MOは任意で、有効時のみ専用パッチを読み込む。CCTOも任意で、枯死温度・休眠はCCTO側が扱う。
+- Grainsと同時に使用する場合は、既存作物パッチを分離済みの新しいGrains版を使用する。
+- セーブ内のDef識別子を追加・変更しない。ただし既存セーブへの導入・削除の互換性は独立に未検証。バックアップを推奨。
+
+## 検証状況
+
+RimWorld Linux 1.6原本による4構成（バニラ／バニラ+CCTO／MO／MO+CCTO）で、13作物の実ロード設定、代表作物のPawn播種・成長・収穫、Grainsとの同時ロード時の設定分離について個別Pickle検査が成功している。MO系にはCrop Growth Balanceとは別の既知FMOD音声エラーが各2件あり、厳格なゲーム全体のERROR0判定は**2/4、ワークフローFAIL**のまま。ゲーム全体でERROR0を保証する記述ではない。詳細は [実機記録](Docs/Testing/Native16-CropGrowth-20261014.md)。
+
+現段階では開発用構成。**一般公開はAMJ Grainsと同時**に行い、Crop Growth Balanceのみ先行公開しない。ユーザーによる長期実プレイは完成必須条件とせず、重大な作物機能不具合がなければ公開候補とする。Steam/2gameへの投稿は未実施。
+
+## インストール
+
+リリース用Modフォルダの直下に `About`、`Patches`、`Compatibility`、`loadFolders.xml` がある状態でRimWorldのModsに配置する。開発ソースZIPをそのまま配置しない。MOを導入している場合はMOより後に読み込む。GitHub上のテスト専用C#や開発ツールはゲームへの配布対象外。
