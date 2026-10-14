@@ -101,6 +101,20 @@ class CropGrowthBalanceTests(unittest.TestCase):
         self.assertEqual([x.text for x in meta.findall('supportedVersions/li')],['1.6'])
         self.assertFalse(meta.findall('modDependencies/li'))
 
+    def test_source_owned_grains_coexistence_is_dev_only(self):
+        feature = (ROOT / "Tests/E2E/crop-growth-grains-16.feature").read_text()
+        steps = (ROOT / "Tests/E2E/CropGrowthGrainsSteps.cs").read_text()
+        self.assertEqual(feature.count("Scenario:"), 1)
+        self.assertIn("Grains and Crop Growth Balance retain separate crop growth ownership", feature)
+        for defname in ("Plant_Potato", "DankPyon_Plant_Lentils",
+                        "AMJC_Plant_FoxtailMillet_Awa", "AMJC_Plant_BarnyardMillet_Hie",
+                        "AMJC_Plant_ProsoMillet_Kibi", "AMJC_Plant_Buckwheat_Soba",
+                        "AMJC_Plant_Barley", "Plant_Rice", "AMJC_Plant_Wheat",
+                        "DankPyon_Plant_Wheat"):
+            self.assertIn(defname, steps)
+        self.assertIn("AMJ_CROP_GRAINS_OWNERSHIP", steps)
+        self.assertNotIn("CropGrowthGrainsSteps", (ROOT / "loadFolders.xml").read_text())
+
     def test_no_accidental_growth_scope(self):
         for f in ROOT.rglob('*.xml'):
             ET.parse(f)
