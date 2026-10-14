@@ -174,9 +174,12 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 ctx.Require(worker.CurJob == job, "Native job not started: " + label);
             }
 
-            private async Task TickJob(Job job, Func<bool> done, string label)
+            // Count real whole-map ticks while the native Pawn JobDriver moves
+            // and performs sowing or harvesting, not just Def base work.
+            private async Task<int> TickJob(Job job, Func<bool> done, string label)
             {
                 bool finished = false;
+                int elapsedTicks = 0;
                 for (int i = 0; i < 16000 && !finished; i += 64)
                 {
                     await RuntimeThread.Run(() =>
@@ -189,6 +192,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                             ctx.Require(worker.CurJob == job,
                                 "Pawn real JobDriver ended without expected result: " + label);
                             Find.TickManager.DoSingleTick();
+                            elapsedTicks++;
                         }
                     });
                     await Task.Delay(1);
@@ -197,8 +201,22 @@ namespace AMJ.CropGrowthBalance.NativeTests
                 {
                     ctx.Require(finished || done(),
                         "Native sow/harvest job exceeded 16000 ticks: " + label);
+                    ctx.Require(elapsedTicks > 0 && elapsedTicks <= 16000,
+                        "Expected nonzero real Pawn job ticks: " + label);
+                    string cropDef = label.StartsWith("tomato-")
+                        ? "DankPyon_Plant_Tomatoes" : crop.defName;
+                    Log.Message("AMJ_CROP_PAWN_JOB_TICKS profile=" + profile +
+                        " crop=" + cropDef +
+                        " job=" + label +
+                        " nativeJobTicks=" + elapsedTicks +
+                        " plantsSkill=" + worker.skills.GetSkill(SkillDefOf.Plants).Level +
+                        " workerHarvestStat=" +
+                        worker.GetStatValue(StatDefOf.PlantHarvestYield).ToString("F4") +
+                        " includesMovement=true wholeMapTickedDuringJob=true" +
+                        " growthIntervalPlantOnly=true fullSeasonSimulated=false");
                     worker.jobs.EndCurrentJob(JobCondition.InterruptForced, false);
                 });
+                return elapsedTicks;
             }
 
 
@@ -294,8 +312,8 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         "Native pawn harvest unavailable on controlled mature tomato");
                     OfferAndStart(job, "tomato-controlled-harvest");
                 });
-                await TickJob(job, () => CountItem(harvestedDef) > before,
-                    "tomato-controlled-harvest");
+                int firstTomatoTicks = await TickJob(job, () =>
+                    CountItem(harvestedDef) > before, "tomato-controlled-harvest");
                 await RuntimeThread.Run(() =>
                 {
                     int count = CountItem(harvestedDef) - before;
@@ -357,12 +375,20 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         "Native WorkGiver did not offer same-plant second tomato harvest");
                     OfferAndStart(secondJob, "tomato-second-harvest");
                 });
-                await TickJob(secondJob, () => CountItem(harvestedDef) > beforeSecond,
-                    "tomato-second-harvest");
+                int secondTomatoTicks = await TickJob(secondJob, () =>
+                    CountItem(harvestedDef) > beforeSecond, "tomato-second-harvest");
                 await RuntimeThread.Run(() =>
                 {
                     int secondCount = CountItem(harvestedDef) - beforeSecond;
                     ctx.Require(secondCount > 0, "Same native tomato yielded no second crop");
+                    ctx.Require(firstTomatoTicks > 0 && secondTomatoTicks > 0,
+                        "Original tomato both real Pawn harvests must consume native ticks");
+                    Log.Message("AMJ_CROP_TOMATO_JOB_TICKS profile=" + profile +
+                        " crop=DankPyon_Plant_Tomatoes" +
+                        " firstHarvestTicks=" + firstTomatoTicks +
+                        " secondHarvestTicks=" + secondTomatoTicks +
+                        " secondSowTicks=0 becauseSameLivingPlant=true" +
+                        " nativeTrellisSowing=false naturalSeason=false");
                     Log.Message("AMJ_CROP_TOMATO_SECOND_HARVEST profile=" + profile +
                         " item=" + harvestedDef + " count=" + secondCount +
                         " growth10=" + secondAt10.ToString("F4") +
@@ -402,7 +428,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         sow.plantDefToSow == crop, "Real sow Job unavailable: " + terrainName);
                     OfferAndStart(sow, "soil-" + terrainName + "-sow");
                 });
-                await TickJob(sow, () => cell.GetPlant(map) != null &&
+                int sowTicks = await TickJob(sow, () => cell.GetPlant(map) != null &&
                     cell.GetPlant(map).def == crop &&
                     cell.GetPlant(map).LifeStage != PlantLifeStage.Sowing,
                     "soil-" + terrainName + "-sow");
@@ -462,13 +488,30 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         "Native pawn cannot harvest mature original crop: " + terrainName);
                     OfferAndStart(harvest, "soil-" + terrainName + "-harvest");
                 });
-                await TickJob(harvest, () => planted.Destroyed && CountHarvest() > before,
+                int harvestTicks = await TickJob(harvest, () =>
+                    planted.Destroyed && CountHarvest() > before,
                     "soil-" + terrainName + "-harvest");
                 await RuntimeThread.Run(() =>
                 {
                     int observed = CountHarvest() - before;
                     float expected = crop.plant.harvestYield;
+                    ctx.Require(sowTicks > 0 && harvestTicks > 0,
+                        "Native planted/harvested cycle must consume real Pawn ticks");
                     ctx.Require(observed > 0, "Actual field produced zero yield: " + terrainName);
+                    float nutritionStat = crop.plant.harvestedThingDef.GetStatValueAbstract(
+                        StatDefOf.Nutrition);
+                    Log.Message("AMJ_CROP_PAWN_CYCLE profile=" + profile +
+                        " crop=" + crop.defName +
+                        " terrain=" + terrainName +
+                        " actualSowTicks=" + sowTicks +
+                        " actualHarvestTicks=" + harvestTicks +
+                        " combinedJobTicks=" + (sowTicks + harvestTicks) +
+                        " harvested=" + observed +
+                        " rawNutritionStat=" + nutritionStat.ToString("F4") +
+                        " rawNutritionStatPerJobTick=" +
+                        (observed * nutritionStat / (sowTicks + harvestTicks)).ToString("F7") +
+                        " includesTravel=true processing=false" +
+                        " controlledPlantOnlyGrowth=true seasonEconomy=false");
                     ctx.Assert(observed >= Math.Floor(expected) &&
                         observed <= Math.Ceiling(expected * 2),
                         "Actual field harvest inconsistent with original Def: " + terrainName +
@@ -505,7 +548,7 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         sow.plantDefToSow == crop, "Actual grower must offer correct sow Job");
                     OfferAndStart(sow, "sow");
                 });
-                await TickJob(sow, () => cell.GetPlant(map) != null &&
+                int soilSowTicks = await TickJob(sow, () => cell.GetPlant(map) != null &&
                     cell.GetPlant(map).def == crop &&
                     cell.GetPlant(map).LifeStage != PlantLifeStage.Sowing, "sow");
 
@@ -579,10 +622,26 @@ namespace AMJ.CropGrowthBalance.NativeTests
                         "Actual native harvest WorkGiver must offer a pawn job");
                     OfferAndStart(harvest, "harvest");
                 });
-                await TickJob(harvest, () => planted.Destroyed && CountHarvest() > before, "harvest");
+                int soilHarvestTicks = await TickJob(harvest, () =>
+                    planted.Destroyed && CountHarvest() > before, "harvest");
                 await RuntimeThread.Run(() =>
                 {
                     int output = CountHarvest() - before;
+                    ctx.Require(soilSowTicks > 0 && soilHarvestTicks > 0,
+                        "Actual Soil cycle did not execute Pawn sow/harvest ticks");
+                    float rawNutritionStat = crop.plant.harvestedThingDef.GetStatValueAbstract(
+                        StatDefOf.Nutrition);
+                    Log.Message("AMJ_CROP_PAWN_CYCLE profile=" + profile +
+                        " crop=" + crop.defName + " terrain=Soil" +
+                        " actualSowTicks=" + soilSowTicks +
+                        " actualHarvestTicks=" + soilHarvestTicks +
+                        " combinedJobTicks=" + (soilSowTicks + soilHarvestTicks) +
+                        " harvested=" + output +
+                        " rawNutritionStat=" + rawNutritionStat.ToString("F4") +
+                        " rawNutritionStatPerJobTick=" +
+                        (output * rawNutritionStat / (soilSowTicks + soilHarvestTicks)).ToString("F7") +
+                        " includesTravel=true processing=false" +
+                        " controlledPlantOnlyGrowth=true seasonEconomy=false");
                     ctx.Require(output > 0, "Real pawn harvested no usable crop items");
                     float expected = crop.plant.harvestYield;
                     ctx.Assert(output >= Math.Floor(expected) &&
