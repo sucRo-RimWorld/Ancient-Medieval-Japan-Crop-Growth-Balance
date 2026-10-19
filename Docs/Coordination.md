@@ -1,5 +1,10 @@
 # AMJ Crop Growth Balance — main-only coordination
 
+## CGB-RETIRED-INTO-GRAINS-20261019 — final superseding status
+
+**ARCHIVED — do not implement or release from this repository.** Author merged Crop Growth Balance into Grains; archived repo [PR #36](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Crop-Growth-Balance/pull/36), `b3b1beaf32243fd0d789fc64d41cb9811d8e85ed`. Production CGB patch XML, About.xml, loadFolders.xml, static testing Workflow and Steam publication workflow deleted. Grains [PR #183](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Grains/pull/183) owns Vanilla6/MO7 original growDays and MO lentils sowMinSkill2. Previous `OPEN — align release timing with Grains`, standalone testing and publisher tasks below are **superseded historical state**. Keep design/native logs as prior-version evidence only. No separate CGB package/publication or hard dependency.
+
+
 Owner: `sucRo-RimWorld/Ancient-Medieval-Japan-Crop-Growth-Balance`. The accepted scope, 13 exact values, and release criteria are in [Design](Design.md); historical 1.6 original-provider native logs and source/game SHAs are in [Testing](Testing/Native16-CropGrowth-20261014.md). [Quantitative history](Balance/PreliminaryHarvestProductivity-20261014.md) is reference-only, not a release gate.
 
 ## OPEN — align release timing with AMJ Grains (2026-10-15 author decision)
