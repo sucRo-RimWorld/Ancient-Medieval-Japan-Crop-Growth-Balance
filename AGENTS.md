@@ -1,8 +1,7 @@
-# AMJ Crop Growth Balance Agent Instructions
+# Retired Crop Growth Balance — Agent Instructions
 
-1. At task start, read this repository's `AGENTS.md`, then `main:Docs/Coordination.md` **once a GitHub main branch has been initialized**; follow Project `AGENTS.md` and `Docs/SharedRules.md`.
-2. `Docs/Design.md` is the canonical crop balance scope/values; `Patches/CropGrowthBalance.xml` and `Compatibility/MedievalOverhaul/Patches/MOCropGrowthBalance.xml` own the XML implementation.
-3. Modify only approved `growDays` unless wider changes have a properly reviewed design and VE/non-VE audit. Never modify Grains seven crop values, Vanilla Plant_Rice or MO wheat here; never add CCTO frost rules.
-4. Keep MO optional in `loadFolders.xml`; Vanilla and Vanilla+CCTO have no unconditional MO Def references.
-5. Test with `python -m unittest discover -s Tests -p 'test_*.py'` before PR, native four-profile Pickle after CI; do not claim loaded-game PASS from static checks.
-6. Use topic branches, PR, exact CI and main verification. No direct main writes. GitHub publication and Steam Workshop are distinct.
+This repository is a **historical archive, not a shippable Mod**. The author merged all its six Vanilla and seven optional MO crop timing values into [AMJ Grains](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Grains) on 2026-10-19, before any standalone public release.
+
+Do not restore source Patches, About.xml, loadFolders.xml, Steam publishing, native test workflows or old `growDays` ownership here. No standalone CGB build/publication is authorized. Existing analysis and former native tests are historical evidence only.
+
+**Current production owner:** Grains `AGENTS.md`, `main:Docs/Coordination.md`, `Docs/Design.md §4.2.1a`. This archive follows Project `AGENTS.md` and `Docs/SharedRules.md` for historical record maintenance. Cross-owner handoffs belong to main-only Coordination files.
