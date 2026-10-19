@@ -1,29 +1,11 @@
-# Ancient & Medieval Japan - Crop Growth Balance（中世日本 - 作物生育期間調整）
+# Crop Growth Balance — 統合済み・公開しないリポジトリ
 
-RimWorld 1.6用の独立したXML Mod。**AMJ Grainsが採用した生育期間のバランスに、バニラとMedieval Overhaulの既存作物を合わせる**ため、対象の `growDays` だけを変更する。現実の栽培期間は相対的な早晩差を考える参考であり、史実どおりの暦日を再現するModではない。
+**2026-10-19 作者決定：Crop Growth Balanceの機能は [AMJ Grains](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Grains) に再統合しました。**
 
-## 変更内容
+- バニラ6作物とMedieval Overhaul（MO）7作物の `growDays` パッチはGrainsの `Patches/ExistingCropGrowthBalance.xml` と `Compatibility/MedievalOverhaul/Patches/MO_ExistingCropGrowthBalance.xml` へ移管。
+- MOレンズ豆の播種スキル2もGrainsへ統合し、Japanizationの重複パッチを廃止。
+- **本リポジトリからのSteam/2game公開・アップロードは行いません。Grainsと二重導入しないでください。**
+- このリポジトリは初期設計・2026-10-14の旧1.6実ゲーム試験・分析・Git履歴の保存用です。旧試験結果は統合後のGrains実機PASSを示すものではありません。
+- ゲーム用のAbout・loadFolders・作物パッチと専用公開Workflowは削除済み。旧ソースと数値はGit履歴に保存されています。
 
-- バニラ6種：ジャガイモ6、トウモロコシ13、イチゴ6、綿花10、ホップ7、スモークリーフ9。
-- Medieval Overhaul（MO）導入時のみ7種：タマネギ8、レンズ豆8、ニンニク10、亜麻9、サトウキビ12、ニンジン6、トマト7。
-- 収穫数・栄養量・研究・栽培条件・耐寒性・品目・画像は変更しない。作物性能の一律均等化は目的としない。
-- AMJ Grainsが所有する七穀、バニラの稲、MOの小麦にはパッチを当てない。
-
-上記はゲームの `growDays` であり、実際の暦日とは異なる。具体的な旧→新の全13件は [設計書](Docs/Design.md) を参照。
-
-## 対応・導入
-
-- 対応ゲーム：**RimWorld 1.6のみ**。1.7対応は未確認。
-- 必須Mod：なし。**AMJ Grainsとの併用を意図した調整Mod**だが、Grains単体・本Mod単体でも動作する。MOは任意で、有効時のみ専用パッチを読み込む。CCTOも任意で、枯死温度・休眠はCCTO側が扱う。
-- Grainsと同時に使用する場合は、既存作物パッチを分離済みの新しいGrains版を使用する。
-- セーブ内のDef識別子を追加・変更しない。ただし既存セーブへの導入・削除の互換性は独立に未検証。バックアップを推奨。
-
-## 検証状況
-
-RimWorld Linux 1.6原本による4構成（バニラ／バニラ+CCTO／MO／MO+CCTO）で、13作物の実ロード設定、代表作物のPawn播種・成長・収穫、Grainsとの同時ロード時の設定分離について個別Pickle検査が成功している。MO系にはCrop Growth Balanceとは別の既知FMOD音声エラーが各2件あり、厳格なゲーム全体のERROR0判定は**2/4、ワークフローFAIL**のまま。ゲーム全体でERROR0を保証する記述ではない。詳細は [実機記録](Docs/Testing/Native16-CropGrowth-20261014.md)。
-
-現段階では開発用構成。**一般公開はAMJ Grainsと同時**に行い、Crop Growth Balanceのみ先行公開しない。ユーザーによる長期実プレイは完成必須条件とせず、重大な作物機能不具合がなければ公開候補とする。Steam/2gameへの投稿は未実施。
-
-## インストール
-
-リリース用Modフォルダの直下に `About`、`Patches`、`Compatibility`、`loadFolders.xml` がある状態でRimWorldのModsに配置する。開発ソースZIPをそのまま配置しない。MOを導入している場合はMOより後に読み込む。GitHub上のテスト専用C#や開発ツールはゲームへの配布対象外。
+現在の正式な仕様・更新履歴・公開判断はGrainsを参照してください。
