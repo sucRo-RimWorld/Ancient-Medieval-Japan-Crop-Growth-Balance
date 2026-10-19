@@ -1,3 +1,5 @@
+> **ARCHIVED 2026-10-19:** Crop Growth BalanceはGrainsへ統合され、独立Modの実装・配布・リリース計画は破棄。以下は**当時の歴史的設計**であり現在の正本ではない。現在の実装・数値・公開条件は [Grainsの設計書](https://github.com/sucRo-RimWorld/Ancient-Medieval-Japan-Grains/blob/main/Docs/Design.md) を参照。旧バニラ6＋MO7のgrowDays、およびMOレンズ豆播種スキル2はGrains所有。Source/Patches/Steam準備は本リポジトリから削除済み。旧ネイティブ実績は統合後のGrainsロードを証明しない。
+
 # Ancient & Medieval Japan - Crop Growth Balance — 設計書
 
 **対象:** RimWorld 1.6。バニラ6作物と任意導入のMedieval Overhaul（MO）7作物。実装は `growDays` のXML置換のみ。1.7は未対応・未検証。
